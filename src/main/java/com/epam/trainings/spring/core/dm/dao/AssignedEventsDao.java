@@ -11,6 +11,6 @@ public interface AssignedEventsDao {
 
     List<AssignedEvent> findByRange(LocalDateTime from, LocalDateTime to);
 
-    void assignAuditorium(Event event, Auditorium auditorium, LocalDateTime dateTime);
+    void assignAuditorium(AssignedEvent assignedEvent);
 
 }

@@ -70,7 +70,7 @@ public class EventServiceImpl implements EventService {
         if (eventDao.find(event.getId()) == null) {
             throw new IllegalArgumentException();
         }
-        assignedEventsDao.assignAuditorium(event, auditorium, dateTime);
+        assignedEventsDao.assignAuditorium(new AssignedEvent(event, auditorium, dateTime));
     }
 
     public void setEventDao(EventDao eventDao) {

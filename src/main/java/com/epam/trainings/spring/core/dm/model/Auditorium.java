@@ -43,22 +43,11 @@ public class Auditorium {
         }
 
         Auditorium that = (Auditorium) o;
-
-        if (seatsNumber != that.seatsNumber) {
-            return false;
-        }
-        if (name != null ? !name.equals(that.name) : that.name != null) {
-            return false;
-        }
-        return !(vipSeats != null ? !vipSeats.equals(that.vipSeats) : that.vipSeats != null);
-
+        return name != null ? name.equals(that.name) : that.name == null;
     }
 
     @Override
     public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + seatsNumber;
-        result = 31 * result + (vipSeats != null ? vipSeats.hashCode() : 0);
-        return result;
+        return name != null ? name.hashCode() : 0;
     }
 }

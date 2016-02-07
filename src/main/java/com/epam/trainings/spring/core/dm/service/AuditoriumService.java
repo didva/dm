@@ -9,8 +9,6 @@ public interface AuditoriumService {
 
     List<Auditorium> getAuditoriums();
 
-    int getSeatsNumber(long id);
-
-    Set<Integer> getVipSeats(long id);
+    Auditorium getAuditorium(String name);
 
 }

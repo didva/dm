@@ -8,6 +8,19 @@ public class AssignedEvent {
     private Auditorium auditorium;
     private LocalDateTime dateTime;
 
+    public AssignedEvent() {
+    }
+
+    public AssignedEvent(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public AssignedEvent(Event event, Auditorium auditorium, LocalDateTime dateTime) {
+        this.event = event;
+        this.auditorium = auditorium;
+        this.dateTime = dateTime;
+    }
+
     public Event getEvent() {
         return event;
     }

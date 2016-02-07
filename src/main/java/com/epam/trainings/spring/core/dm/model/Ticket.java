@@ -1,5 +1,6 @@
 package com.epam.trainings.spring.core.dm.model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ public class Ticket {
 
     private long id;
     private long eventId;
+    private LocalDateTime eventDateTime;
     private Long userId;
     private List<Seat> seats;
     private double finalPrice;
@@ -35,11 +37,19 @@ public class Ticket {
         this.eventId = eventId;
     }
 
-    public List<Seat> getSeat() {
+    public LocalDateTime getEventDateTime() {
+        return eventDateTime;
+    }
+
+    public void setEventDateTime(LocalDateTime eventDateTime) {
+        this.eventDateTime = eventDateTime;
+    }
+
+    public List<Seat> getSeats() {
         return new ArrayList<>(seats);
     }
 
-    public void setSeat(List<Seat> seats) {
+    public void setSeats(List<Seat> seats) {
         this.seats = seats;
     }
 

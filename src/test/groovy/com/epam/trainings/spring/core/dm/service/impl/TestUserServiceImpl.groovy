@@ -1,11 +1,10 @@
-package dm.service.impl
+package com.epam.trainings.spring.core.dm.service.impl
 
+import com.epam.trainings.spring.core.dm.Utils
 import com.epam.trainings.spring.core.dm.dao.TicketDao
 import com.epam.trainings.spring.core.dm.dao.UserDao
 import com.epam.trainings.spring.core.dm.exceptions.service.AlreadyExistsException
-import com.epam.trainings.spring.core.dm.model.Ticket
 import com.epam.trainings.spring.core.dm.model.User
-import com.epam.trainings.spring.core.dm.service.impl.UserServiceImpl
 import org.junit.Before
 import org.junit.Test
 
@@ -28,7 +27,7 @@ class TestUserServiceImpl {
         userService.userDao = userDao;
         userService.ticketDao = ticketDao;
 
-        user = createUser(0, "test_name", "test_email", LocalDate.now());
+        user = Utils.createUser(0, "test_name", "test_email", LocalDate.now());
     }
 
     @Test
@@ -102,7 +101,7 @@ class TestUserServiceImpl {
     @Test
     void testGetUsersByName() {
         final String name = "test_name"
-        def users = [user, createUser(2, "test_name", "email2", LocalDate.now())]
+        def users = [user, Utils.createUser(2, "test_name", "email2", LocalDate.now())]
         when(userDao.findByName(name)).thenReturn(users)
 
         assert users == userService.getUsersByName(name)
@@ -116,7 +115,7 @@ class TestUserServiceImpl {
     @Test
     void testGetBookedTickets() {
         final long userId = 1
-        def tickets = [createTicket(1), createTicket(2)]
+        def tickets = [Utils.createTicket(1), Utils.createTicket(2)]
         when(userDao.find(userId)).thenReturn(user)
         when(ticketDao.findByUserId(userId)).thenReturn(tickets)
 
@@ -129,21 +128,5 @@ class TestUserServiceImpl {
         when(userDao.find(userId)).thenReturn(null)
 
         userService.getBookedTickets(userId)
-    }
-
-
-    def createUser = { long id, String name, String email, LocalDate birthDate ->
-        user = User.newInstance();
-        user.id = id;
-        user.name = name;
-        user.email = email;
-        user.birthDate = birthDate
-        user
-    }
-
-    def createTicket = { id ->
-        def ticket = Ticket.newInstance();
-        ticket.id = id;
-        ticket
     }
 }

@@ -9,4 +9,10 @@ public interface DiscountService {
 
     double getDiscount(User user, Event event, LocalDateTime dateTime);
 
+    interface DiscountStrategy {
+
+        double getDiscount(User user, Event event, LocalDateTime dateTime);
+
+    }
+
 }

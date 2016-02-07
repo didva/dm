@@ -38,4 +38,27 @@ public class Seat {
     public void setVip(boolean vip) {
         isVip = vip;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Seat seat = (Seat) o;
+
+        if (id != seat.id) return false;
+        if (auditoriumId != seat.auditoriumId) return false;
+        if (number != seat.number) return false;
+        return isVip == seat.isVip;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (int) (auditoriumId ^ (auditoriumId >>> 32));
+        result = 31 * result + number;
+        result = 31 * result + (isVip ? 1 : 0);
+        return result;
+    }
 }
