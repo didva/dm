@@ -24,7 +24,7 @@ beans {
         userDao = ref('userDao')
         ticketDao = ref('ticketDao')
     }
-    auditoriumServie(AuditoriumServiceImpl) {
+    auditoriumService(AuditoriumServiceImpl) {
         auditoriumDao = ref('auditoriumDao')
     }
     birthdayDiscountStrategy(BirthdayDiscountStrategy) {
@@ -42,6 +42,7 @@ beans {
         discountService = ref('discountService')
         ticketDao = ref('ticketDao')
         assignedEventsDao = ref('assignedEventsDao')
+        auditoriumService = ref('auditoriumService')
     }
     eventServive(EventServiceImpl) {
         eventDao = ref('eventDao')

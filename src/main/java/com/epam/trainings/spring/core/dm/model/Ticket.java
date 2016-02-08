@@ -1,8 +1,8 @@
 package com.epam.trainings.spring.core.dm.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Ticket {
 
@@ -10,7 +10,7 @@ public class Ticket {
     private long eventId;
     private LocalDateTime eventDateTime;
     private Long userId;
-    private List<Seat> seats;
+    private Set<Seat> seats;
     private double finalPrice;
 
     public long getId() {
@@ -45,11 +45,11 @@ public class Ticket {
         this.eventDateTime = eventDateTime;
     }
 
-    public List<Seat> getSeats() {
-        return new ArrayList<>(seats);
+    public Set<Seat> getSeats() {
+        return new HashSet<>(seats);
     }
 
-    public void setSeats(List<Seat> seats) {
+    public void setSeats(Set<Seat> seats) {
         this.seats = seats;
     }
 
@@ -99,5 +99,17 @@ public class Ticket {
         temp = Double.doubleToLongBits(finalPrice);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Ticket{" +
+               "id=" + id +
+               ", eventId=" + eventId +
+               ", eventDateTime=" + eventDateTime +
+               ", userId=" + userId +
+               ", seats=" + seats +
+               ", finalPrice=" + finalPrice +
+               '}';
     }
 }

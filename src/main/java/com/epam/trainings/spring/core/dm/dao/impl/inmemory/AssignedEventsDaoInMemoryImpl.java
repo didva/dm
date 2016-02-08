@@ -13,6 +13,11 @@ public class AssignedEventsDaoInMemoryImpl implements AssignedEventsDao {
     private TreeSet<AssignedEvent> events = new TreeSet<>();
 
     @Override
+    public List<AssignedEvent> findAll() {
+        return new ArrayList<>(events);
+    }
+
+    @Override
     public List<AssignedEvent> findByRange(LocalDateTime from, LocalDateTime to) {
         return new ArrayList<>(events.subSet(new AssignedEvent(from), new AssignedEvent(to)));
     }

@@ -13,4 +13,15 @@ public enum Rating {
     public double getMultiplier() {
         return multiplier;
     }
+
+    @Override
+    public String toString() {
+        String rating = "LOW";
+        if (this == Rating.HIGH) {
+            rating = "HIGH";
+        } else if (this == Rating.MID) {
+            rating = "MID";
+        }
+        return "Rating{" + rating + "}";
+    }
 }

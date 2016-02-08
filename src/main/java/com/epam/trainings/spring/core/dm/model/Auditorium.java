@@ -50,4 +50,13 @@ public class Auditorium {
     public int hashCode() {
         return name != null ? name.hashCode() : 0;
     }
+
+    @Override
+    public String toString() {
+        return "Auditorium{" +
+               "name='" + name + '\'' +
+               ", seatsNumber=" + seatsNumber +
+               ", vipSeats=" + vipSeats +
+               '}';
+    }
 }

@@ -17,16 +17,15 @@ class TestAuditoriumService {
     void init() {
         def context = new GenericGroovyApplicationContext("classpath:context.groovy");
 
-        auditorium1 = createAuditorium "auditoriumB", 15, [11, 12, 13, 14, 15] as Set
-        auditorium2 = createAuditorium "auditoriumC", 10, [1, 2, 3, 4, 5] as Set
+        auditorium1 = createAuditorium "testAuditoriumB", 15, [11, 12, 13, 14, 15] as Set
+        auditorium2 = createAuditorium "testAuditoriumC", 10, [1, 2, 3, 4, 5] as Set
         auditoriumService = context.getBean AuditoriumService
     }
 
     @Test
     void testGetAuditoriums() {
         def actual = auditoriumService.getAuditoriums()
-        assert 2 == actual.size()
-        assert [auditorium1, auditorium2].containsAll(actual)
+        assert actual.containsAll([auditorium1, auditorium2])
     }
 
     @Test

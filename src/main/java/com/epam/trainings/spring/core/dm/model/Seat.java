@@ -3,7 +3,7 @@ package com.epam.trainings.spring.core.dm.model;
 public class Seat {
 
     private long id;
-    private long auditoriumId;
+    private String auditorium;
     private int number;
     private boolean isVip;
 
@@ -15,12 +15,12 @@ public class Seat {
         this.id = id;
     }
 
-    public long getAuditoriumId() {
-        return auditoriumId;
+    public String getAuditorium() {
+        return auditorium;
     }
 
-    public void setAuditoriumId(long auditoriumId) {
-        this.auditoriumId = auditoriumId;
+    public void setAuditorium(String auditorium) {
+        this.auditorium = auditorium;
     }
 
     public int getNumber() {
@@ -41,24 +41,44 @@ public class Seat {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Seat seat = (Seat) o;
 
-        if (id != seat.id) return false;
-        if (auditoriumId != seat.auditoriumId) return false;
-        if (number != seat.number) return false;
-        return isVip == seat.isVip;
+        if (id != seat.id) {
+            return false;
+        }
+        if (number != seat.number) {
+            return false;
+        }
+        if (isVip != seat.isVip) {
+            return false;
+        }
+        return !(auditorium != null ? !auditorium.equals(seat.auditorium) : seat.auditorium != null);
 
     }
 
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (int) (auditoriumId ^ (auditoriumId >>> 32));
+        result = 31 * result + (auditorium != null ? auditorium.hashCode() : 0);
         result = 31 * result + number;
         result = 31 * result + (isVip ? 1 : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Seat{" +
+               "id=" + id +
+               ", auditorium='" + auditorium + '\'' +
+               ", number=" + number +
+               ", isVip=" + isVip +
+               '}';
     }
 }

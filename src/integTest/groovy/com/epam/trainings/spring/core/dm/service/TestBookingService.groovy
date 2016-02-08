@@ -36,7 +36,7 @@ class TestBookingService {
         user = createUser 0, "name", "email", LocalDate.now().plusDays(2)
         userService.register user
 
-        auditorium = auditoriumService.getAuditorium "auditoriumC"
+        auditorium = auditoriumService.getAuditorium "testAuditoriumC"
 
         event = createEvent "testEvent", 100D, Rating.HIGH
         eventService.create event
@@ -48,24 +48,25 @@ class TestBookingService {
 
     @Test
     void testGetTicketPrice() {
-        Seat seat1 = createSeat(1L, false), seat2 = createSeat(2, true)
+        Seat seat1 = createSeat(1, 10, false, auditorium.name), seat2 = createSeat(2, 1, true, auditorium.name)
         double expectedPrice = (event.price + event.price * 2) * event.rating.multiplier
-        assert expectedPrice == bookingService.getTicketPrice(event, eventDateTime, [seat1, seat2], user)
+        assert expectedPrice == bookingService.getTicketPrice(event, eventDateTime, [seat1, seat2] as Set, user)
     }
 
     @Test
     void testGetTicketPriceWithDiscount() {
-        Seat seat1 = createSeat(1L, false), seat2 = createSeat(2, true)
+        Seat seat1 = createSeat(1, 10, false, auditorium.name), seat2 = createSeat(2, 1, true, auditorium.name)
         double expectedPrice = (event.price + event.price * 2) * event.rating.multiplier * (1 - birthdayDiscountStrategy.discountPercentage)
-        assert expectedPrice == bookingService.getTicketPrice(event, user.birthDate.atStartOfDay(), [seat1, seat2], user)
+        eventService.assignAuditorium event, auditorium, user.birthDate.atStartOfDay()
+        assert expectedPrice == bookingService.getTicketPrice(event, user.birthDate.atStartOfDay(), [seat1, seat2] as Set, user)
     }
 
     @Test
     void testBookTicket() {
-        def seat1 = createSeat(1, false), seat2 = createSeat(2, true),
-            seat3 = createSeat(3, true), seat4 = createSeat(4, true)
-        def finalPrice1 = bookingService.getTicketPrice(event, eventDateTime, [seat1, seat2], user),
-            finalPrice2 = bookingService.getTicketPrice(event, eventDateTime, [seat3, seat4], null)
+        def seat1 = createSeat(10, 10, false, auditorium.name), seat2 = createSeat(2, 2, true, auditorium.name),
+            seat3 = createSeat(3, 3, true, auditorium.name), seat4 = createSeat(4, 4, true, auditorium.name)
+        def finalPrice1 = bookingService.getTicketPrice(event, eventDateTime, [seat1, seat2] as Set, user),
+            finalPrice2 = bookingService.getTicketPrice(event, eventDateTime, [seat3, seat4] as Set, null)
         def ticket1 = createTicket(1, event.id, eventDateTime, user.id, [seat1, seat2], finalPrice1),
             ticket2 = createTicket(2, event.id, eventDateTime, user.id, [seat3, seat4], finalPrice2)
 

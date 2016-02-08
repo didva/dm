@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--Properties Start-->
+    <context:property-placeholder location="classpath:config.properties"/>
+    <!--Properties End-->
+
+    <!--DAOs Start-->
+    <bean id="userDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.UserDaoInMemoryImpl"/>
+    <bean id="ticketDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.TicketDaoInMemoryImpl"/>
+    <bean id="eventDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.EventDaoInMemoryImpl"/>
+    <bean id="assignedEventsDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.AssignedEventsDaoInMemoryImpl"/>
+    <bean id="auditoriumDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.AuditoriumDaoInMemoryImpl">
+        <constructor-arg value="${auditorium.properties.path}"/>
+    </bean>
+    <!--DAOs End-->
+
+    <!--Services Start-->
+    <bean id="auditoriumService" class="com.epam.trainings.spring.core.dm.service.impl.AuditoriumServiceImpl">
+        <property name="auditoriumDao" ref="auditoriumDao"/>
+    </bean>
+    <bean id="discountService" class="com.epam.trainings.spring.core.dm.service.impl.DiscountServiceImpl">
+        <property name="strategies">
+            <list>
+                <bean class="com.epam.trainings.spring.core.dm.service.impl.strategies.BirthdayDiscountStrategy">
+                    <property name="discountPercentage" value="${discount.birthday.discountPercentage}"/>
+                </bean>
+                <bean class="com.epam.trainings.spring.core.dm.service.impl.strategies.NthMultipleTicketDiscountStrategy">
+                    <property name="ticketDao" ref="ticketDao"/>
+                    <property name="discountPercentage" value="${discount.nthTicket.discountPercentage}"/>
+                    <property name="ticketsToDiscount" value="${discount.nthTicket.ticketsToDiscount}"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+    <bean id="bookingService" class="com.epam.trainings.spring.core.dm.service.impl.BookingServiceImpl">
+        <property name="ticketDao" ref="ticketDao"/>
+        <property name="assignedEventsDao" ref="assignedEventsDao"/>
+        <property name="auditoriumService" ref="auditoriumService"/>
+        <property name="discountService" ref="discountService"/>
+    </bean>
+    <bean id="eventService" class="com.epam.trainings.spring.core.dm.service.impl.EventServiceImpl">
+        <property name="eventDao" ref="eventDao"/>
+        <property name="assignedEventsDao" ref="assignedEventsDao"/>
+    </bean>
+    <bean id="userService" class="com.epam.trainings.spring.core.dm.service.impl.UserServiceImpl">
+        <property name="userDao" ref="userDao"/>
+        <property name="ticketDao" ref="ticketDao"/>
+    </bean>
+    <!--Services End-->
+
+    <!-- UI Start-->
+    <bean id="consoleReader" class="com.epam.trainings.spring.core.dm.ui.ConsoleReader"/>
+    <bean id="menu" class="com.epam.trainings.spring.core.dm.ui.menus.console.BaseMenu">
+        <property name="adminMenu">
+            <bean class="com.epam.trainings.spring.core.dm.ui.menus.console.AdminMenu">
+                <property name="parent" ref="menu"/>
+                <property name="consoleReader" ref="consoleReader"/>
+                <property name="auditoriumService" ref="auditoriumService"/>
+                <property name="bookingService" ref="bookingService"/>
+                <property name="eventService" ref="eventService"/>
+            </bean>
+        </property>
+    </bean>
+    <!-- UI End-->
+
+</beans>

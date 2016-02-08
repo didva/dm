@@ -99,4 +99,13 @@ public class AssignedEvent implements Comparable<AssignedEvent> {
         }
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "AssignedEvent{" +
+               "event=" + event +
+               ", auditorium=" + auditorium +
+               ", dateTime=" + dateTime +
+               '}';
+    }
 }

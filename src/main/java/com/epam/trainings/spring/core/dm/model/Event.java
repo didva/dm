@@ -74,4 +74,14 @@ public class Event {
         result = 31 * result + (rating != null ? rating.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+               "id=" + id +
+               ", name='" + name + '\'' +
+               ", price=" + price +
+               ", rating=" + rating +
+               '}';
+    }
 }

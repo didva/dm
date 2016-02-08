@@ -71,7 +71,7 @@ class TestUserServiceImpl {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    void testDeleteUnexistingUser() {
+    void testDeleteNonExistingUser() {
         final long id = 1
         when(userDao.find(id)).thenReturn(null)
 
@@ -124,7 +124,7 @@ class TestUserServiceImpl {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    void testGetBookedTicketsUnexistingUser() {
+    void testGetBookedTicketsNonExistingUser() {
         final long userId = 1
         when(userDao.find(userId)).thenReturn(null)
 

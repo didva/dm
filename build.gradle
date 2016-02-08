@@ -4,8 +4,6 @@ version '1.0-SNAPSHOT'
 apply plugin: 'groovy'
 apply plugin: 'java'
 
-sourceCompatibility = 1.8
-
 repositories {
     mavenCentral()
 }
@@ -17,12 +15,12 @@ sourceSets {
             runtimeClasspath += main.output + test.output
             srcDir file('src/integTest/groovy')
         }
-        resources.srcDir file('src/integTest/resources')
+        resources.srcDirs = [file('src/integTest/resources')]
     }
     test {
         groovy.srcDir file('src/test/groovy')
         if(System.properties.'idea.active') {
-            resources.srcDirs += file('src/integTest/resources')
+            resources.srcDirs = [file('src/integTest/resources')]
         }
     }
 }

@@ -52,7 +52,7 @@ class TestUserService {
     }
 
     @Test(expected = IllegalArgumentException)
-    void testDeleteUnexistingUser() {
+    void testDeleteNonExistingUser() {
         userService.remove(1)
     }
 
@@ -76,13 +76,14 @@ class TestUserService {
     @Test
     void testGetBookedTickets() {
         def eventDateTime = LocalDateTime.now(), event = createEvent("testEvent", 100D, Rating.HIGH),
-            auditorium = auditoriumService.getAuditorium("auditoriumC"),
-            seat1 = createSeat(1, false), seat2 = createSeat(2, true),
-            finalPrice = bookingService.getTicketPrice(event, eventDateTime, [seat1, seat2], user)
+            auditorium = auditoriumService.getAuditorium("testAuditoriumC"),
+            seat1 = createSeat(1, 10, false, auditorium.name), seat2 = createSeat(2, 2, true, auditorium.name)
 
         eventService.create event
         eventService.assignAuditorium event, auditorium, eventDateTime
         userService.register user
+
+        def finalPrice = bookingService.getTicketPrice(event, eventDateTime, [seat1, seat2] as Set, user)
 
         def ticket = createTicket(1, event.id, eventDateTime, user.id, [seat1, seat2], finalPrice)
         bookingService.bookTicket user, ticket

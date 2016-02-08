@@ -16,7 +16,7 @@ class Utils {
         user
     }
 
-    static Ticket createTicket(id, eventId, eventDateTime, userId, seats, finalPrice) {
+    static Ticket createTicket(long id, long eventId, LocalDateTime eventDateTime, Long userId, List<Seat> seats, double finalPrice) {
         def ticket = Ticket.newInstance();
         ticket.id = id;
         ticket.eventId = eventId;
@@ -51,10 +51,12 @@ class Utils {
         auditorium
     }
 
-    static Seat createSeat(long id, boolean vip) {
+    static Seat createSeat(long id, int number, boolean vip, String auditorium) {
         def seat = Seat.newInstance();
         seat.id = id;
         seat.vip = vip
+        seat.auditorium = auditorium
+        seat.number = number
         seat
     }
 

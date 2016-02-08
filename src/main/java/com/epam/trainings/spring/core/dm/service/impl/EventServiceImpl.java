@@ -50,6 +50,23 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public AssignedEvent getAssignedEvent(long eventId, LocalDateTime dateTime) {
+        if (dateTime == null) {
+            throw new IllegalArgumentException();
+        }
+        Event event = eventDao.find(eventId);
+        if (event == null) {
+            throw new IllegalArgumentException();
+        }
+        return assignedEventsDao.findByEvent(eventId, dateTime);
+    }
+
+    @Override
+    public List<AssignedEvent> getAllAssignedEvents() {
+        return assignedEventsDao.findAll();
+    }
+
+    @Override
     public List<AssignedEvent> getForDateRange(LocalDateTime from, LocalDateTime to) {
         if (from == null || to == null) {
             throw new IllegalArgumentException();

@@ -17,6 +17,10 @@ public interface EventService {
 
     List<Event> getAll();
 
+    AssignedEvent getAssignedEvent(long eventId, LocalDateTime dateTime);
+
+    List<AssignedEvent> getAllAssignedEvents();
+
     List<AssignedEvent> getForDateRange(LocalDateTime from, LocalDateTime to);
 
     List<AssignedEvent> getNextEvents(LocalDateTime to);

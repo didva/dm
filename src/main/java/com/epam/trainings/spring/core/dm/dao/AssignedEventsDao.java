@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface AssignedEventsDao {
 
+    List<AssignedEvent> findAll();
+
     List<AssignedEvent> findByRange(LocalDateTime from, LocalDateTime to);
 
     void assignAuditorium(AssignedEvent assignedEvent);

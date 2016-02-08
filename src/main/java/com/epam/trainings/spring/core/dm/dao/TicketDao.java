@@ -13,6 +13,6 @@ public interface TicketDao {
 
     void add(User user, Ticket ticket);
 
-    List<Ticket> findByEvent(Event event, LocalDateTime dateTime);
+    List<Ticket> findByEvent(long event, LocalDateTime dateTime);
 
 }

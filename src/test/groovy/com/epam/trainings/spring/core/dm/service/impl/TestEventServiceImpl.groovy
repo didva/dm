@@ -15,14 +15,18 @@ import java.time.LocalDateTime
 
 import static com.epam.trainings.spring.core.dm.Utils.createAssignedEvent
 import static com.epam.trainings.spring.core.dm.Utils.createAuditorium
+import static org.mockito.Matchers.*
 import static org.mockito.Mockito.*
 
 class TestEventServiceImpl {
 
     EventServiceImpl eventService;
-    Event event;
+
     EventDao eventDao
     AssignedEventsDao assignedEventsDao
+
+    Event event;
+    AssignedEvent assignedEvent
 
     @Before
     void init() {
@@ -33,6 +37,7 @@ class TestEventServiceImpl {
         eventService.assignedEventsDao = assignedEventsDao
 
         event = Utils.createEvent "test_name", 12.5, Rating.HIGH
+        assignedEvent = createAssignedEvent event, createAuditorium("name", 1, [] as Set), LocalDateTime.now()
     }
 
     @Test
@@ -74,7 +79,7 @@ class TestEventServiceImpl {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    void testDeleteUnexistingEvent() {
+    void testDeleteNonExistingEvent() {
         final long id = 1
         when(eventDao.find(id)).thenReturn null
 
@@ -99,6 +104,30 @@ class TestEventServiceImpl {
 
         assert events == eventService.getAll()
         verify(eventDao, times(1)).findAll()
+    }
+
+    @Test
+    void testGetAssignedEvent() {
+        when(assignedEventsDao.findByEvent(event.id, assignedEvent.dateTime)).thenReturn assignedEvent
+        when(eventDao.find(event.id)).thenReturn event
+
+        assert assignedEvent == eventService.getAssignedEvent(event.id, assignedEvent.dateTime)
+    }
+
+    @Test(expected = IllegalArgumentException)
+    void testGetAssignedEventIncorrectDateTime() {
+        eventService.getAssignedEvent event.id, null
+    }
+
+    @Test(expected = IllegalArgumentException)
+    void testGetAssignedEventNonExistingEvent() {
+        eventService.getAssignedEvent 10, LocalDateTime.now()
+    }
+
+    @Test
+    void testGetAllAssignedEvents() {
+        when(assignedEventsDao.findAll()).thenReturn([assignedEvent])
+        assert [assignedEvent] == eventService.getAllAssignedEvents()
     }
 
     @Test
@@ -178,7 +207,7 @@ class TestEventServiceImpl {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    void testAssignAuditoriumUnexistingEvent() {
+    void testAssignAuditoriumNonExistingEvent() {
         def time = LocalDateTime.now(), auditorium = createAuditorium("a_name1", 1, [] as Set)
         when(eventDao.find(event.id)).thenReturn null
 

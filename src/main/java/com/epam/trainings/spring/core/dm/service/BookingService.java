@@ -7,10 +7,11 @@ import com.epam.trainings.spring.core.dm.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public interface BookingService {
 
-    double getTicketPrice(Event event, LocalDateTime dateTime, List<Seat> seats, User user);
+    double getTicketPrice(Event event, LocalDateTime dateTime, Set<Seat> seats, User user);
 
     void bookTicket(User user, Ticket ticket);
 

@@ -46,7 +46,7 @@ class TestEventService {
     }
 
     @Test(expected = IllegalArgumentException)
-    void testRemoveUnexisting() {
+    void testRemoveNonExisting() {
         eventService.remove 1
     }
 
