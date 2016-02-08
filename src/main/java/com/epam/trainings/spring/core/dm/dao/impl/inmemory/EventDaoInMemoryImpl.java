@@ -14,6 +14,7 @@ public class EventDaoInMemoryImpl implements EventDao {
 
     @Override
     public void add(Event event) {
+        event.setId(eventMap.size() + 1);
         eventMap.put(event.getId(), event);
     }
 

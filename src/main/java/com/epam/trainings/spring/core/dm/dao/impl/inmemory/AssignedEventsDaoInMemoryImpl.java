@@ -10,7 +10,7 @@ import java.util.TreeSet;
 
 public class AssignedEventsDaoInMemoryImpl implements AssignedEventsDao {
 
-    private TreeSet<AssignedEvent> events = new TreeSet<>((o1, o2) -> o1.getDateTime().compareTo(o2.getDateTime()));
+    private TreeSet<AssignedEvent> events = new TreeSet<>();
 
     @Override
     public List<AssignedEvent> findByRange(LocalDateTime from, LocalDateTime to) {
@@ -20,5 +20,11 @@ public class AssignedEventsDaoInMemoryImpl implements AssignedEventsDao {
     @Override
     public void assignAuditorium(AssignedEvent assignedEvent) {
         events.add(assignedEvent);
+    }
+
+    @Override
+    public AssignedEvent findByEvent(long eventId, LocalDateTime dateTime) {
+        return events.stream().filter(e -> e.getEvent().getId() == eventId && e.getDateTime().equals(dateTime))
+                .findFirst().orElse(null);
     }
 }

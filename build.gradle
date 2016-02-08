@@ -10,9 +10,41 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    integTest {
+        groovy {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integTest/groovy')
+        }
+        resources.srcDir file('src/integTest/resources')
+    }
+    test {
+        groovy.srcDir file('src/test/groovy')
+        if(System.properties.'idea.active') {
+            resources.srcDirs += file('src/integTest/resources')
+        }
+    }
+}
+
+configurations {
+    integTestCompile.extendsFrom testCompile
+    integTestRuntime.extendsFrom testRuntime
+}
+
+task integTest(type: Test) {
+    testClassesDir = sourceSets.integTest.output.classesDir
+    classpath = sourceSets.integTest.runtimeClasspath
+}
+
 dependencies {
     compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'org.springframework:spring-context:4.2.4.RELEASE'
     testCompile 'org.codehaus.groovy:groovy-all:2.3.11'
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-all:1.8.4'
+    integTestCompile 'org.springframework:spring-test:4.2.4.RELEASE'
 }
+
+check.dependsOn integTest
+integTest.mustRunAfter test

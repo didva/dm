@@ -10,6 +10,7 @@ import org.junit.Test
 
 import java.time.LocalDate
 
+import static com.epam.trainings.spring.core.dm.Utils.createTicket
 import static org.mockito.Mockito.*
 
 class TestUserServiceImpl {
@@ -115,7 +116,7 @@ class TestUserServiceImpl {
     @Test
     void testGetBookedTickets() {
         final long userId = 1
-        def tickets = [Utils.createTicket(1), Utils.createTicket(2)]
+        def tickets = [createTicket(1, 1, null, null, null, 0), createTicket(2, 1, null, null, null, 0)]
         when(userDao.find(userId)).thenReturn(user)
         when(ticketDao.findByUserId(userId)).thenReturn(tickets)
 

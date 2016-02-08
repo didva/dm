@@ -35,7 +35,7 @@ class TestNthMultipleDiscountStrategy {
         def price = 100, discount = 50D, dateTime = LocalDateTime.now(),
             user = createUser(1, "name", "email", dateTime.toLocalDate()),
             event = createEvent("eName", price, Rating.HIGH),
-            tickets = [createTicket(1)]
+            tickets = [createTicket(1, 1, null, null, null, 0)]
         when(ticketDao.findByUserId(user.id)).thenReturn(tickets)
 
         assert discount == discountStrategy.getDiscount(user, event, dateTime)

@@ -1,10 +1,8 @@
 package com.epam.trainings.spring.core.dm.service.impl;
 
+import com.epam.trainings.spring.core.dm.dao.AssignedEventsDao;
 import com.epam.trainings.spring.core.dm.dao.TicketDao;
-import com.epam.trainings.spring.core.dm.model.Event;
-import com.epam.trainings.spring.core.dm.model.Seat;
-import com.epam.trainings.spring.core.dm.model.Ticket;
-import com.epam.trainings.spring.core.dm.model.User;
+import com.epam.trainings.spring.core.dm.model.*;
 import com.epam.trainings.spring.core.dm.service.BookingService;
 import com.epam.trainings.spring.core.dm.service.DiscountService;
 
@@ -15,6 +13,7 @@ public class BookingServiceImpl implements BookingService {
 
     private DiscountService discountService;
     private TicketDao ticketDao;
+    private AssignedEventsDao assignedEventsDao;
 
     @Override
     public double getTicketPrice(Event event, LocalDateTime dateTime, List<Seat> seats, User user) {
@@ -35,6 +34,15 @@ public class BookingServiceImpl implements BookingService {
         if (ticket == null) {
             throw new IllegalArgumentException();
         }
+        AssignedEvent assignedEvent = assignedEventsDao.findByEvent(ticket.getEventId(), ticket.getEventDateTime());
+        if (assignedEvent == null) {
+            throw new IllegalArgumentException();
+        }
+        boolean alreadyBooked = ticketDao.findByEvent(assignedEvent.getEvent(), assignedEvent.getDateTime()).stream()
+                .anyMatch(t -> t.getSeats().removeAll(ticket.getSeats()));
+        if (alreadyBooked) {
+            throw new IllegalArgumentException();
+        }
         ticketDao.add(user, ticket);
     }
 
@@ -52,5 +60,9 @@ public class BookingServiceImpl implements BookingService {
 
     public void setTicketDao(TicketDao ticketDao) {
         this.ticketDao = ticketDao;
+    }
+
+    public void setAssignedEventsDao(AssignedEventsDao assignedEventsDao) {
+        this.assignedEventsDao = assignedEventsDao;
     }
 }

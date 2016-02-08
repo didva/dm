@@ -2,7 +2,7 @@ package com.epam.trainings.spring.core.dm.model;
 
 import java.time.LocalDateTime;
 
-public class AssignedEvent {
+public class AssignedEvent implements Comparable<AssignedEvent> {
 
     private Event event;
     private Auditorium auditorium;
@@ -71,6 +71,32 @@ public class AssignedEvent {
         int result = event != null ? event.hashCode() : 0;
         result = 31 * result + (auditorium != null ? auditorium.hashCode() : 0);
         result = 31 * result + (dateTime != null ? dateTime.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public int compareTo(AssignedEvent o) {
+        int result = this.getDateTime().compareTo(o.getDateTime());
+        if (result == 0) {
+            if (event == null && o.getEvent() != null) {
+                return -1;
+            } else if (event == null && o.getEvent() == null) {
+                return 0;
+            } else if (event != null && o.getEvent() == null) {
+                return 1;
+            }
+            result = Long.compare(event.getId(), o.getEvent().getId());
+        }
+        if (result == 0) {
+            if (auditorium == null && o.getAuditorium() != null) {
+                return -1;
+            } else if (auditorium == null && o.getAuditorium() == null) {
+                return 0;
+            } else if (auditorium != null && o.getAuditorium() == null) {
+                return 1;
+            }
+            result = auditorium.getName().compareTo(o.getAuditorium().getName());
+        }
         return result;
     }
 }

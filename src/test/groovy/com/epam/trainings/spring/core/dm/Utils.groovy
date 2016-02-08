@@ -16,9 +16,14 @@ class Utils {
         user
     }
 
-    static Ticket createTicket(long id) {
+    static Ticket createTicket(id, eventId, eventDateTime, userId, seats, finalPrice) {
         def ticket = Ticket.newInstance();
         ticket.id = id;
+        ticket.eventId = eventId;
+        ticket.eventDateTime = eventDateTime;
+        ticket.userId = userId;
+        ticket.seats = seats;
+        ticket.finalPrice = finalPrice;
         ticket
     }
 
@@ -38,9 +43,11 @@ class Utils {
         assignedEvent
     }
 
-    static Auditorium createAuditorium(String name) {
-        def auditorium = Auditorium.newInstance();
-        auditorium.name = name;
+    static Auditorium createAuditorium(String name, int seats, Set<Integer> vip) {
+        def auditorium = Auditorium.newInstance()
+        auditorium.name = name
+        auditorium.seatsNumber = seats
+        auditorium.vipSeats = vip
         auditorium
     }
 

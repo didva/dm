@@ -34,6 +34,10 @@ public class NthMultipleTicketDiscountStrategy implements DiscountService.Discou
         this.discountPercentage = discountPercentage;
     }
 
+    public double getDiscountPercentage() {
+        return discountPercentage;
+    }
+
     public void setTicketsToDiscount(int ticketsToDiscount) {
         if (ticketsToDiscount <= 0) {
             throw new IllegalArgumentException();

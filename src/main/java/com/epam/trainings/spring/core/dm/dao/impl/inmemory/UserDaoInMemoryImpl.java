@@ -30,7 +30,7 @@ public class UserDaoInMemoryImpl implements UserDao {
 
     @Override
     public User findByEmail(String email) {
-        return userMap.values().stream().filter(u -> u.getEmail().equals(email)).findFirst().orElseGet(null);
+        return userMap.values().stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
     }
 
     @Override
