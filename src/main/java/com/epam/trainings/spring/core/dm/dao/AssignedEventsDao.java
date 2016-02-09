@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface AssignedEventsDao {
 
+    AssignedEvent find(long id);
+
     List<AssignedEvent> findAll();
 
     List<AssignedEvent> findByRange(LocalDateTime from, LocalDateTime to);
@@ -15,5 +17,7 @@ public interface AssignedEventsDao {
     void assignAuditorium(AssignedEvent assignedEvent);
 
     AssignedEvent findByEvent(long eventId, LocalDateTime dateTime);
+
+    AssignedEvent findByAuditorium(String auditorium, LocalDateTime dateTime);
 
 }

@@ -9,7 +9,8 @@ import org.springframework.context.support.GenericGroovyApplicationContext
 
 import java.time.LocalDateTime
 
-import static com.epam.trainings.spring.core.dm.Utils.*
+import static com.epam.trainings.spring.core.dm.Utils.createAuditorium
+import static com.epam.trainings.spring.core.dm.Utils.createEvent
 
 class TestEventService {
 
@@ -65,16 +66,16 @@ class TestEventService {
     void testAssignAuditorium() {
         def event2 = createEvent "event2", 200, Rating.LOW
         def dateTimeEvent1 = LocalDateTime.now(), dateTimeEvent2 = LocalDateTime.now().plusDays(2),
-            assignedEvent1 = createAssignedEvent(event, createAuditorium("auditorium1", 1, [] as Set), dateTimeEvent1),
-            assignedEvent2 = createAssignedEvent(event2, createAuditorium("auditorium2", 1, [] as Set), dateTimeEvent2)
-
+            auditorium1 = createAuditorium("auditorium1", 1, []), auditorium2 = createAuditorium("auditorium2", 1, [])
 
         eventService.create event
         eventService.create event2
 
-        eventService.assignAuditorium assignedEvent1.event, assignedEvent1.auditorium, assignedEvent1.dateTime
-        eventService.assignAuditorium assignedEvent2.event, assignedEvent2.auditorium, assignedEvent2.dateTime
+        eventService.assignAuditorium event, auditorium1, dateTimeEvent1
+        eventService.assignAuditorium event2, auditorium2, dateTimeEvent2
 
-        assert [assignedEvent2] == eventService.getForDateRange(LocalDateTime.now(), dateTimeEvent2.plusSeconds(1))
+        def expected = [eventService.getAssignedEvent(event2.id, dateTimeEvent2)]
+        assert expected == eventService.getForDateRange(LocalDateTime.now(), dateTimeEvent2.plusSeconds(1))
     }
 }
+

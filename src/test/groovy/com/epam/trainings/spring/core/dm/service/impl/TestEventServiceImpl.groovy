@@ -15,7 +15,6 @@ import java.time.LocalDateTime
 
 import static com.epam.trainings.spring.core.dm.Utils.createAssignedEvent
 import static com.epam.trainings.spring.core.dm.Utils.createAuditorium
-import static org.mockito.Matchers.*
 import static org.mockito.Mockito.*
 
 class TestEventServiceImpl {
@@ -37,7 +36,7 @@ class TestEventServiceImpl {
         eventService.assignedEventsDao = assignedEventsDao
 
         event = Utils.createEvent "test_name", 12.5, Rating.HIGH
-        assignedEvent = createAssignedEvent event, createAuditorium("name", 1, [] as Set), LocalDateTime.now()
+        assignedEvent = createAssignedEvent event.id, "name", LocalDateTime.now()
     }
 
     @Test
@@ -133,7 +132,7 @@ class TestEventServiceImpl {
     @Test
     void testGetForDateRange() {
         def from = LocalDateTime.now(), to = from.plusDays(2),
-            assignedAudits = [createAssignedEvent(event, createAuditorium("aName", 1, [] as Set), from.plusDays(1))]
+            assignedAudits = [createAssignedEvent(event.id, "aName", from.plusDays(1))]
         when(assignedEventsDao.findByRange(from, to)).thenReturn assignedAudits
 
         assert assignedAudits == eventService.getForDateRange(from, to)
@@ -154,7 +153,7 @@ class TestEventServiceImpl {
     void testGetNextEvents() {
         def deviationSeconds = 5
         def fromMin = LocalDateTime.now(), fromMax = fromMin.plusSeconds(deviationSeconds), to = fromMin.plusDays(2),
-            assignedAudits = [createAssignedEvent(event, createAuditorium("aName", 1, [] as Set), fromMin.plusDays(1))]
+            assignedAudits = [createAssignedEvent(event.id, "aName", fromMin.plusDays(1))]
         when(assignedEventsDao.findByRange(argThat(new ArgumentMatcher() {
 
             @Override
@@ -175,16 +174,34 @@ class TestEventServiceImpl {
 
     @Test
     void testAssignAuditorium() {
-        def time = LocalDateTime.now(), auditorium = createAuditorium("a_name1", 1, [] as Set)
+        def time = LocalDateTime.now(), auditorium = createAuditorium("a_name1", 1, [])
         when(eventDao.find(event.id)).thenReturn event
 
         eventService.assignAuditorium event, auditorium, time
-        verify(assignedEventsDao, times(1)).assignAuditorium(new AssignedEvent(event, auditorium, time))
+        verify(assignedEventsDao, times(1)).assignAuditorium(new AssignedEvent(event.id, auditorium.name, time))
+    }
+
+    @Test(expected = AlreadyExistsException)
+    void testAssignAuditoriumWhenAuditoriumAlreadyAssigned() {
+        def time = LocalDateTime.now(), auditorium = createAuditorium("a_name1", 1, [])
+        when(eventDao.find(event.id)).thenReturn event
+        when(assignedEventsDao.findByAuditorium(auditorium.name, time)).thenReturn assignedEvent
+
+        eventService.assignAuditorium event, auditorium, time
+    }
+
+    @Test(expected = AlreadyExistsException)
+    void testAssignAuditoriumWhenEventForThisTimeAlreadyAssigned() {
+        def time = LocalDateTime.now(), auditorium = createAuditorium("a_name1", 1, [])
+        when(eventDao.find(event.id)).thenReturn event
+        when(assignedEventsDao.findByEvent(event.id, time)).thenReturn assignedEvent
+
+        eventService.assignAuditorium event, auditorium, time
     }
 
     @Test(expected = IllegalArgumentException.class)
     void testAssignAuditoriumIllegalEvent() {
-        def time = LocalDateTime.now(), auditorium = createAuditorium("a_name1", 1, [] as Set)
+        def time = LocalDateTime.now(), auditorium = createAuditorium("a_name1", 1, [])
         eventService.assignAuditorium null, auditorium, time
     }
 
@@ -196,19 +213,19 @@ class TestEventServiceImpl {
 
     @Test(expected = IllegalArgumentException.class)
     void testAssignAuditoriumIllegalAuditoriumName() {
-        def time = LocalDateTime.now(), auditorium = createAuditorium(null, 1, [] as Set)
+        def time = LocalDateTime.now(), auditorium = createAuditorium(null, 1, [])
         eventService.assignAuditorium event, auditorium, time
     }
 
     @Test(expected = IllegalArgumentException.class)
     void testAssignAuditoriumIllegalDateTime() {
-        def auditorium = createAuditorium("a_name1", 1, [] as Set)
+        def auditorium = createAuditorium("a_name1", 1, [])
         eventService.assignAuditorium event, auditorium, null
     }
 
     @Test(expected = IllegalArgumentException.class)
     void testAssignAuditoriumNonExistingEvent() {
-        def time = LocalDateTime.now(), auditorium = createAuditorium("a_name1", 1, [] as Set)
+        def time = LocalDateTime.now(), auditorium = createAuditorium("a_name1", 1, [])
         when(eventDao.find(event.id)).thenReturn null
 
         eventService.assignAuditorium event, auditorium, time

@@ -4,8 +4,9 @@ import java.time.LocalDateTime;
 
 public class AssignedEvent implements Comparable<AssignedEvent> {
 
-    private Event event;
-    private Auditorium auditorium;
+    private long id;
+    private long eventId;
+    private String auditorium;
     private LocalDateTime dateTime;
 
     public AssignedEvent() {
@@ -15,25 +16,25 @@ public class AssignedEvent implements Comparable<AssignedEvent> {
         this.dateTime = dateTime;
     }
 
-    public AssignedEvent(Event event, Auditorium auditorium, LocalDateTime dateTime) {
-        this.event = event;
+    public AssignedEvent(long eventId, String auditorium, LocalDateTime dateTime) {
+        this.eventId = eventId;
         this.auditorium = auditorium;
         this.dateTime = dateTime;
     }
 
-    public Event getEvent() {
-        return event;
+    public long getEventId() {
+        return eventId;
     }
 
-    public void setEvent(Event event) {
-        this.event = event;
+    public void setEventId(long eventId) {
+        this.eventId = eventId;
     }
 
-    public Auditorium getAuditorium() {
+    public String getAuditorium() {
         return auditorium;
     }
 
-    public void setAuditorium(Auditorium auditorium) {
+    public void setAuditorium(String auditorium) {
         this.auditorium = auditorium;
     }
 
@@ -45,30 +46,32 @@ public class AssignedEvent implements Comparable<AssignedEvent> {
         this.dateTime = dateTime;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         AssignedEvent that = (AssignedEvent) o;
 
-        if (event != null ? !event.equals(that.event) : that.event != null) {
-            return false;
-        }
-        if (auditorium != null ? !auditorium.equals(that.auditorium) : that.auditorium != null) {
-            return false;
-        }
-        return !(dateTime != null ? !dateTime.equals(that.dateTime) : that.dateTime != null);
+        if (id != that.id) return false;
+        if (eventId != that.eventId) return false;
+        if (auditorium != null ? !auditorium.equals(that.auditorium) : that.auditorium != null) return false;
+        return dateTime != null ? dateTime.equals(that.dateTime) : that.dateTime == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = event != null ? event.hashCode() : 0;
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (int) (eventId ^ (eventId >>> 32));
         result = 31 * result + (auditorium != null ? auditorium.hashCode() : 0);
         result = 31 * result + (dateTime != null ? dateTime.hashCode() : 0);
         return result;
@@ -78,14 +81,7 @@ public class AssignedEvent implements Comparable<AssignedEvent> {
     public int compareTo(AssignedEvent o) {
         int result = this.getDateTime().compareTo(o.getDateTime());
         if (result == 0) {
-            if (event == null && o.getEvent() != null) {
-                return -1;
-            } else if (event == null && o.getEvent() == null) {
-                return 0;
-            } else if (event != null && o.getEvent() == null) {
-                return 1;
-            }
-            result = Long.compare(event.getId(), o.getEvent().getId());
+            result = Long.compare(eventId, o.getEventId());
         }
         if (result == 0) {
             if (auditorium == null && o.getAuditorium() != null) {
@@ -95,7 +91,10 @@ public class AssignedEvent implements Comparable<AssignedEvent> {
             } else if (auditorium != null && o.getAuditorium() == null) {
                 return 1;
             }
-            result = auditorium.getName().compareTo(o.getAuditorium().getName());
+            result = auditorium.compareTo(o.getAuditorium());
+        }
+        if (result == 0) {
+            result = Long.compare(id, o.getId());
         }
         return result;
     }
@@ -103,9 +102,10 @@ public class AssignedEvent implements Comparable<AssignedEvent> {
     @Override
     public String toString() {
         return "AssignedEvent{" +
-               "event=" + event +
-               ", auditorium=" + auditorium +
-               ", dateTime=" + dateTime +
-               '}';
+                "id=" + id +
+                ", eventId=" + eventId +
+                ", auditorium=" + auditorium +
+                ", dateTime=" + dateTime +
+                '}';
     }
 }

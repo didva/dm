@@ -3,6 +3,7 @@ package com.epam.trainings.spring.core.dm.dao.impl.inmemory;
 import com.epam.trainings.spring.core.dm.dao.UserDao;
 import com.epam.trainings.spring.core.dm.model.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,11 @@ public class UserDaoInMemoryImpl implements UserDao {
     @Override
     public User find(long id) {
         return userMap.get(id);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return new ArrayList<>(userMap.values());
     }
 
     @Override

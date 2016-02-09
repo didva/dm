@@ -23,7 +23,7 @@ class TestAuditoriumServiceImpl {
 
     @Test
     void testGetAuditoriums() {
-        def auditoriums = [Utils.createAuditorium("name1", 1, [] as Set), Utils.createAuditorium("name2", 1, [] as Set)]
+        def auditoriums = [Utils.createAuditorium("name1", 1, []), Utils.createAuditorium("name2", 1, [])]
         when(auditoriumDao.findAll()).thenReturn auditoriums
 
         assert auditoriums == auditoriumService.getAuditoriums()
@@ -32,7 +32,7 @@ class TestAuditoriumServiceImpl {
     @Test
     void testGetAuditorium() {
         def name = "name1"
-        def auditorium = Utils.createAuditorium(name, 1, [] as Set)
+        def auditorium = Utils.createAuditorium(name, 1, [])
         when(auditoriumDao.findByName(name)).thenReturn auditorium
 
         assert auditorium == auditoriumService.getAuditorium(name)

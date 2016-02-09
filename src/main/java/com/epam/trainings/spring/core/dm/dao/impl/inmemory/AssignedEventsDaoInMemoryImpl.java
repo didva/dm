@@ -13,6 +13,11 @@ public class AssignedEventsDaoInMemoryImpl implements AssignedEventsDao {
     private TreeSet<AssignedEvent> events = new TreeSet<>();
 
     @Override
+    public AssignedEvent find(long id) {
+        return events.stream().filter(e -> e.getId() == id).findFirst().orElse(null);
+    }
+
+    @Override
     public List<AssignedEvent> findAll() {
         return new ArrayList<>(events);
     }
@@ -24,12 +29,19 @@ public class AssignedEventsDaoInMemoryImpl implements AssignedEventsDao {
 
     @Override
     public void assignAuditorium(AssignedEvent assignedEvent) {
+        assignedEvent.setId(events.size() + 1);
         events.add(assignedEvent);
     }
 
     @Override
     public AssignedEvent findByEvent(long eventId, LocalDateTime dateTime) {
-        return events.stream().filter(e -> e.getEvent().getId() == eventId && e.getDateTime().equals(dateTime))
+        return events.stream().filter(e -> e.getEventId() == eventId && e.getDateTime().equals(dateTime)).findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public AssignedEvent findByAuditorium(String auditorium, LocalDateTime dateTime) {
+        return events.stream().filter(e -> e.getAuditorium().equals(auditorium) && e.getDateTime().equals(dateTime))
                 .findFirst().orElse(null);
     }
 }

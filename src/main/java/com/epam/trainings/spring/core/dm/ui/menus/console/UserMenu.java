@@ -3,7 +3,9 @@ package com.epam.trainings.spring.core.dm.ui.menus.console;
 import com.epam.trainings.spring.core.dm.exceptions.service.AlreadyExistsException;
 import com.epam.trainings.spring.core.dm.model.AssignedEvent;
 import com.epam.trainings.spring.core.dm.model.Event;
+import com.epam.trainings.spring.core.dm.model.Ticket;
 import com.epam.trainings.spring.core.dm.model.User;
+import com.epam.trainings.spring.core.dm.service.AuditoriumService;
 import com.epam.trainings.spring.core.dm.service.BookingService;
 import com.epam.trainings.spring.core.dm.service.EventService;
 import com.epam.trainings.spring.core.dm.service.UserService;
@@ -12,6 +14,8 @@ import com.epam.trainings.spring.core.dm.ui.Menu;
 import com.epam.trainings.spring.core.dm.ui.Utils;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 public class UserMenu implements Menu {
 
@@ -20,6 +24,7 @@ public class UserMenu implements Menu {
     private UserService userService;
     private EventService eventService;
     private BookingService bookingService;
+    private AuditoriumService auditoriumService;
 
     @Override
     public void printMenu() {
@@ -27,7 +32,7 @@ public class UserMenu implements Menu {
         System.out.println("2 - View assigned events by date range");
         System.out.println("3 - View next assigned events");
         System.out.println("4 - Get ticket price");
-        System.out.println("5 - Buy ticket");
+        System.out.println("5 - Book ticket");
         System.out.println("0 - Back");
     }
 
@@ -47,7 +52,7 @@ public class UserMenu implements Menu {
                 getTicketPrice();
                 break;
             case 5:
-                //TODO: Buy ticket
+                bookTicket();
                 break;
             case 0:
                 return parent;
@@ -55,6 +60,44 @@ public class UserMenu implements Menu {
                 System.out.println("Incorrect choice!");
         }
         return this;
+    }
+
+    private void bookTicket() {
+        Event event = Utils.getEventByName(consoleReader, eventService);
+        if (event == null) {
+            return;
+        }
+        LocalDateTime dateTime = Utils.readDateTime(consoleReader);
+        AssignedEvent assignedEvent = Utils.getAssignedEvent(eventService, event, dateTime);
+        if (assignedEvent == null) {
+            return;
+        }
+        User user = null;
+        if (!isUserAnonymous()) {
+            user = getUserByEmail();
+            if (user == null) {
+                return;
+            }
+        }
+        int seatsNumber = auditoriumService.getAuditorium(assignedEvent.getAuditorium()).getSeatsNumber();
+        Set<Integer> seats = readSeatsInformation(seatsNumber);
+        try {
+            Ticket ticket = getTicket(event, dateTime, assignedEvent, user, seats);
+            bookingService.bookTicket(user, ticket);
+        } catch (AlreadyExistsException e) {
+            System.out.println("Sorry, this seats already booked!");
+        }
+
+    }
+
+    private Ticket getTicket(Event event, LocalDateTime dateTime, AssignedEvent assignedEvent, User user,
+                             Set<Integer> seats) {
+        Ticket ticket = new Ticket();
+        ticket.setAssignedEventId(assignedEvent.getId());
+        ticket.setFinalPrice(bookingService.getTicketPrice(event, dateTime, seats, user));
+        ticket.setSeats(seats);
+        ticket.setUserId(user == null ? null : user.getId());
+        return ticket;
     }
 
     private void getTicketPrice() {
@@ -67,14 +110,58 @@ public class UserMenu implements Menu {
         if (assignedEvent == null) {
             return;
         }
-        //TODO: add selecting user + entering seats information
-        bookingService.getTicketPrice(event, dateTime, null, null);
+        User user = null;
+        if (!isUserAnonymous()) {
+            user = getUserByEmail();
+            if (user == null) {
+                return;
+            }
+        }
+        int seatsNumber = auditoriumService.getAuditorium(assignedEvent.getAuditorium()).getSeatsNumber();
+        Set<Integer> seats = readSeatsInformation(seatsNumber);
+        System.out.println("Price is: " + bookingService.getTicketPrice(event, dateTime, seats, user));
     }
 
+    private Set<Integer> readSeatsInformation(int seatsNumber) {
+        Set<Integer> seats = new HashSet<>();
+        do {
+            System.out.println("Please enter seat number: ");
+            int seat = consoleReader.readInt();
+            if (seat <= 0 || seat > seatsNumber) {
+                System.out.println("Incorrect seat for this auditorium, seats number = " + seatsNumber);
+                System.out.println("Enter any other seat (true/false)?");
+                continue;
+            }
+            seats.add(seat);
+            System.out.println("Enter any other seat (true/false)?");
+        } while (consoleReader.readBoolean());
+        return seats;
+    }
+
+    private boolean isUserAnonymous() {
+        System.out.println("Is user anonymous (true/false)?");
+        return consoleReader.readBoolean();
+    }
+
+    private User getUserByEmail() {
+        System.out.println("Please enter user email: ");
+        String email = consoleReader.readString();
+        User user = userService.getUserByEmail(email);
+        if (user == null) {
+            System.out.println("No user was found!");
+            System.out.println("Here are all users: ");
+            System.out.println(userService.getAll());
+        }
+        return user;
+    }
 
     private void getNextAssignedEvents() {
         System.out.println("Please enter 'to' date time, example 1986-04-08 12:30: ");
         LocalDateTime to = consoleReader.readLocalDateTime();
+        if (!to.isAfter(LocalDateTime.now())) {
+            System.out.println("Incorrect 'to' date, it should be after 'now'!");
+            return;
+        }
         System.out.println(eventService.getNextEvents(to));
     }
 
@@ -83,6 +170,10 @@ public class UserMenu implements Menu {
         LocalDateTime from = consoleReader.readLocalDateTime();
         System.out.println("Please enter 'to' date time, example 1986-04-08 12:30: ");
         LocalDateTime to = consoleReader.readLocalDateTime();
+        if (!to.isAfter(from)) {
+            System.out.println("Incorrect 'to' date, it should be after 'from'!");
+            return;
+        }
         System.out.println(eventService.getForDateRange(from, to));
     }
 
@@ -106,4 +197,27 @@ public class UserMenu implements Menu {
         return user;
     }
 
+    public void setParent(Menu parent) {
+        this.parent = parent;
+    }
+
+    public void setConsoleReader(ConsoleReader consoleReader) {
+        this.consoleReader = consoleReader;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    public void setEventService(EventService eventService) {
+        this.eventService = eventService;
+    }
+
+    public void setBookingService(BookingService bookingService) {
+        this.bookingService = bookingService;
+    }
+
+    public void setAuditoriumService(AuditoriumService auditoriumService) {
+        this.auditoriumService = auditoriumService;
+    }
 }

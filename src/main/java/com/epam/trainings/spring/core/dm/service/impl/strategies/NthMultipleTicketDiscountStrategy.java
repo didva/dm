@@ -1,6 +1,6 @@
 package com.epam.trainings.spring.core.dm.service.impl.strategies;
 
-import com.epam.trainings.spring.core.dm.dao.TicketDao;
+import com.epam.trainings.spring.core.dm.dao.TicketsDao;
 import com.epam.trainings.spring.core.dm.model.Event;
 import com.epam.trainings.spring.core.dm.model.Ticket;
 import com.epam.trainings.spring.core.dm.model.User;
@@ -13,7 +13,7 @@ public class NthMultipleTicketDiscountStrategy implements DiscountService.Discou
 
     private double discountPercentage;
     private int ticketsToDiscount;
-    private TicketDao ticketDao;
+    private TicketsDao ticketsDao;
 
     @Override
     public double getDiscount(User user, Event event, LocalDateTime dateTime) {
@@ -23,7 +23,7 @@ public class NthMultipleTicketDiscountStrategy implements DiscountService.Discou
         if (user == null) {
             return 0;
         }
-        List<Ticket> tickets = ticketDao.findByUserId(user.getId());
+        List<Ticket> tickets = ticketsDao.findByUserId(user.getId());
         if (tickets.isEmpty() || ticketsToDiscount == 0) {
             return 0;
         }
@@ -34,10 +34,6 @@ public class NthMultipleTicketDiscountStrategy implements DiscountService.Discou
         this.discountPercentage = discountPercentage;
     }
 
-    public double getDiscountPercentage() {
-        return discountPercentage;
-    }
-
     public void setTicketsToDiscount(int ticketsToDiscount) {
         if (ticketsToDiscount <= 0) {
             throw new IllegalArgumentException();
@@ -45,7 +41,7 @@ public class NthMultipleTicketDiscountStrategy implements DiscountService.Discou
         this.ticketsToDiscount = ticketsToDiscount;
     }
 
-    public void setTicketDao(TicketDao ticketDao) {
-        this.ticketDao = ticketDao;
+    public void setTicketsDao(TicketsDao ticketsDao) {
+        this.ticketsDao = ticketsDao;
     }
 }

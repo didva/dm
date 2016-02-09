@@ -9,7 +9,7 @@
 
     <!--DAOs Start-->
     <bean id="userDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.UserDaoInMemoryImpl"/>
-    <bean id="ticketDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.TicketDaoInMemoryImpl"/>
+    <bean id="ticketsDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.TicketsDaoInMemoryImpl"/>
     <bean id="eventDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.EventDaoInMemoryImpl"/>
     <bean id="assignedEventsDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.AssignedEventsDaoInMemoryImpl"/>
     <bean id="auditoriumDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.AuditoriumDaoInMemoryImpl">
@@ -28,7 +28,7 @@
                     <property name="discountPercentage" value="${discount.birthday.discountPercentage}"/>
                 </bean>
                 <bean class="com.epam.trainings.spring.core.dm.service.impl.strategies.NthMultipleTicketDiscountStrategy">
-                    <property name="ticketDao" ref="ticketDao"/>
+                    <property name="ticketsDao" ref="ticketsDao"/>
                     <property name="discountPercentage" value="${discount.nthTicket.discountPercentage}"/>
                     <property name="ticketsToDiscount" value="${discount.nthTicket.ticketsToDiscount}"/>
                 </bean>
@@ -36,7 +36,7 @@
         </property>
     </bean>
     <bean id="bookingService" class="com.epam.trainings.spring.core.dm.service.impl.BookingServiceImpl">
-        <property name="ticketDao" ref="ticketDao"/>
+        <property name="ticketsDao" ref="ticketsDao"/>
         <property name="assignedEventsDao" ref="assignedEventsDao"/>
         <property name="auditoriumService" ref="auditoriumService"/>
         <property name="discountService" ref="discountService"/>
@@ -47,7 +47,7 @@
     </bean>
     <bean id="userService" class="com.epam.trainings.spring.core.dm.service.impl.UserServiceImpl">
         <property name="userDao" ref="userDao"/>
-        <property name="ticketDao" ref="ticketDao"/>
+        <property name="ticketsDao" ref="ticketsDao"/>
     </bean>
     <!--Services End-->
 
@@ -60,6 +60,16 @@
                 <property name="consoleReader" ref="consoleReader"/>
                 <property name="auditoriumService" ref="auditoriumService"/>
                 <property name="bookingService" ref="bookingService"/>
+                <property name="eventService" ref="eventService"/>
+            </bean>
+        </property>
+        <property name="userMenu">
+            <bean class="com.epam.trainings.spring.core.dm.ui.menus.console.UserMenu">
+                <property name="parent" ref="menu"/>
+                <property name="consoleReader" ref="consoleReader"/>
+                <property name="userService" ref="userService"/>
+                <property name="bookingService" ref="bookingService"/>
+                <property name="auditoriumService" ref="auditoriumService"/>
                 <property name="eventService" ref="eventService"/>
             </bean>
         </property>

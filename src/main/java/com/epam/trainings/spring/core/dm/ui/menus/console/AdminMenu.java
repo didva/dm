@@ -72,7 +72,13 @@ public class AdminMenu implements Menu {
             return;
         }
         LocalDateTime dateTime = Utils.readDateTime(consoleReader);
-        eventService.assignAuditorium(event, auditorium, dateTime);
+        try {
+            eventService.assignAuditorium(event, auditorium, dateTime);
+        } catch (AlreadyExistsException e) {
+            System.out.println("Already this time is already assigned for this event or this auditory!");
+            System.out.println("Here are all assigned events: ");
+            System.out.println(eventService.getAllAssignedEvents());
+        }
     }
 
     private Auditorium getAuditoriumByName() {

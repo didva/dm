@@ -20,6 +20,7 @@ class TestBookingService {
 
     User user
     Event event
+    AssignedEvent assignedEvent
     Auditorium auditorium
     LocalDateTime eventDateTime
     BirthdayDiscountStrategy birthdayDiscountStrategy
@@ -38,37 +39,38 @@ class TestBookingService {
 
         auditorium = auditoriumService.getAuditorium "testAuditoriumC"
 
-        event = createEvent "testEvent", 100D, Rating.HIGH
+        event = createEvent "testEvent", 100, Rating.HIGH
         eventService.create event
         eventDateTime = LocalDateTime.now()
         eventService.assignAuditorium event, auditorium, eventDateTime
+        assignedEvent = eventService.getAssignedEvent event.id, eventDateTime
 
         birthdayDiscountStrategy = context.getBean BirthdayDiscountStrategy
     }
 
     @Test
     void testGetTicketPrice() {
-        Seat seat1 = createSeat(1, 10, false, auditorium.name), seat2 = createSeat(2, 1, true, auditorium.name)
+        def seats = [10, 1]
         double expectedPrice = (event.price + event.price * 2) * event.rating.multiplier
-        assert expectedPrice == bookingService.getTicketPrice(event, eventDateTime, [seat1, seat2] as Set, user)
+        assert expectedPrice == bookingService.getTicketPrice(event, eventDateTime, seats as Set, user)
     }
 
     @Test
     void testGetTicketPriceWithDiscount() {
-        Seat seat1 = createSeat(1, 10, false, auditorium.name), seat2 = createSeat(2, 1, true, auditorium.name)
-        double expectedPrice = (event.price + event.price * 2) * event.rating.multiplier * (1 - birthdayDiscountStrategy.discountPercentage)
+        def seats = [10, 1], discountPercentage = 0.95D,
+            expectedPrice = (event.price + event.price * 2) * event.rating.multiplier * discountPercentage
+
         eventService.assignAuditorium event, auditorium, user.birthDate.atStartOfDay()
-        assert expectedPrice == bookingService.getTicketPrice(event, user.birthDate.atStartOfDay(), [seat1, seat2] as Set, user)
+        assert expectedPrice == bookingService.getTicketPrice(event, user.birthDate.atStartOfDay(), seats as Set, user)
     }
 
     @Test
     void testBookTicket() {
-        def seat1 = createSeat(10, 10, false, auditorium.name), seat2 = createSeat(2, 2, true, auditorium.name),
-            seat3 = createSeat(3, 3, true, auditorium.name), seat4 = createSeat(4, 4, true, auditorium.name)
-        def finalPrice1 = bookingService.getTicketPrice(event, eventDateTime, [seat1, seat2] as Set, user),
-            finalPrice2 = bookingService.getTicketPrice(event, eventDateTime, [seat3, seat4] as Set, null)
-        def ticket1 = createTicket(1, event.id, eventDateTime, user.id, [seat1, seat2], finalPrice1),
-            ticket2 = createTicket(2, event.id, eventDateTime, user.id, [seat3, seat4], finalPrice2)
+        def seats1 = [9, 10], seats2 = [1, 4],
+            finalPrice1 = bookingService.getTicketPrice(event, eventDateTime, seats1 as Set, user),
+            finalPrice2 = bookingService.getTicketPrice(event, eventDateTime, seats2 as Set, null),
+            ticket1 = createTicket(1, assignedEvent.id, user.id, seats1, finalPrice1),
+            ticket2 = createTicket(2, assignedEvent.id, user.id, seats2, finalPrice2)
 
         bookingService.bookTicket user, ticket1
         bookingService.bookTicket null, ticket2

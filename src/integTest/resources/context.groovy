@@ -15,14 +15,14 @@ beans {
     assignedEventsDao(AssignedEventsDaoInMemoryImpl)
     auditoriumDao(AuditoriumDaoInMemoryImpl, properties.get("auditorium.properties.path"))
     eventDao(EventDaoInMemoryImpl)
-    ticketDao(TicketDaoInMemoryImpl)
+    ticketsDao(TicketsDaoInMemoryImpl)
     userDao(UserDaoInMemoryImpl)
     // DAOs end
 
     // Services start
     userService(UserServiceImpl) {
         userDao = ref('userDao')
-        ticketDao = ref('ticketDao')
+        ticketsDao = ref('ticketsDao')
     }
     auditoriumService(AuditoriumServiceImpl) {
         auditoriumDao = ref('auditoriumDao')
@@ -33,14 +33,14 @@ beans {
     nthMultipleTicketDiscountStrategy(NthMultipleTicketDiscountStrategy) {
         discountPercentage = properties.get "discount.nthTicket.discountPercentage"
         ticketsToDiscount = properties.get "discount.nthTicket.ticketsToDiscount"
-        ticketDao = ref('ticketDao')
+        ticketsDao = ref('ticketsDao')
     }
     discountService(DiscountServiceImpl) {
         strategies = [ref('nthMultipleTicketDiscountStrategy'), ref('birthdayDiscountStrategy')]
     }
     bookingService(BookingServiceImpl) {
         discountService = ref('discountService')
-        ticketDao = ref('ticketDao')
+        ticketsDao = ref('ticketsDao')
         assignedEventsDao = ref('assignedEventsDao')
         auditoriumService = ref('auditoriumService')
     }

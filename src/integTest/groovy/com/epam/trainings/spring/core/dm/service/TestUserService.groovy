@@ -76,17 +76,18 @@ class TestUserService {
     @Test
     void testGetBookedTickets() {
         def eventDateTime = LocalDateTime.now(), event = createEvent("testEvent", 100D, Rating.HIGH),
-            auditorium = auditoriumService.getAuditorium("testAuditoriumC"),
-            seat1 = createSeat(1, 10, false, auditorium.name), seat2 = createSeat(2, 2, true, auditorium.name)
+            auditorium = auditoriumService.getAuditorium("testAuditoriumC"), seats = [10, 2]
 
         eventService.create event
         eventService.assignAuditorium event, auditorium, eventDateTime
         userService.register user
 
-        def finalPrice = bookingService.getTicketPrice(event, eventDateTime, [seat1, seat2] as Set, user)
+        def finalPrice = bookingService.getTicketPrice(event, eventDateTime, seats as Set, user),
+            assignedEvent = eventService.getAssignedEvent(event.id, eventDateTime),
+            ticket = createTicket(1, assignedEvent.id, user.id, seats, finalPrice)
 
-        def ticket = createTicket(1, event.id, eventDateTime, user.id, [seat1, seat2], finalPrice)
         bookingService.bookTicket user, ticket
+
         assert [ticket] == userService.getBookedTickets(user.id)
     }
 }

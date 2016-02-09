@@ -16,13 +16,12 @@ class Utils {
         user
     }
 
-    static Ticket createTicket(long id, long eventId, LocalDateTime eventDateTime, Long userId, List<Seat> seats, double finalPrice) {
+    static Ticket createTicket(long id, long assignedEventId, Long userId, List<Integer> seats, double finalPrice) {
         def ticket = Ticket.newInstance();
         ticket.id = id;
-        ticket.eventId = eventId;
-        ticket.eventDateTime = eventDateTime;
+        ticket.assignedEventId = assignedEventId;
         ticket.userId = userId;
-        ticket.seats = seats;
+        ticket.seats = seats as Set;
         ticket.finalPrice = finalPrice;
         ticket
     }
@@ -35,29 +34,20 @@ class Utils {
         event
     }
 
-    static AssignedEvent createAssignedEvent(Event event, Auditorium auditorium, LocalDateTime dateTime) {
+    static AssignedEvent createAssignedEvent(Long eventId, String auditorium, LocalDateTime dateTime) {
         def assignedEvent = AssignedEvent.newInstance();
-        assignedEvent.event = event;
+        assignedEvent.eventId = eventId;
         assignedEvent.auditorium = auditorium
         assignedEvent.dateTime = dateTime
         assignedEvent
     }
 
-    static Auditorium createAuditorium(String name, int seats, Set<Integer> vip) {
+    static Auditorium createAuditorium(String name, int seats, List<Integer> vip) {
         def auditorium = Auditorium.newInstance()
         auditorium.name = name
         auditorium.seatsNumber = seats
-        auditorium.vipSeats = vip
+        auditorium.vipSeats = vip as Set
         auditorium
-    }
-
-    static Seat createSeat(long id, int number, boolean vip, String auditorium) {
-        def seat = Seat.newInstance();
-        seat.id = id;
-        seat.vip = vip
-        seat.auditorium = auditorium
-        seat.number = number
-        seat
     }
 
 }

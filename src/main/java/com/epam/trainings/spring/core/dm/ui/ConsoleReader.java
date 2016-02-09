@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 
 public class ConsoleReader {
 
@@ -19,7 +20,7 @@ public class ConsoleReader {
             try {
                 return Rating.valueOf(reader.readLine().toUpperCase());
             } catch (IllegalArgumentException e) {
-                System.out.println("Please enter correct rating!");
+                System.out.println("Please enter correct rating: " + Arrays.toString(Rating.values()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -38,18 +39,6 @@ public class ConsoleReader {
         }
     }
 
-    public long readLong() {
-        while (true) {
-            try {
-                return Long.parseLong(reader.readLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter correct long value!");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
     public int readInt() {
         while (true) {
             try {
@@ -59,6 +48,14 @@ public class ConsoleReader {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    public boolean readBoolean() {
+        try {
+            return Boolean.parseBoolean(reader.readLine());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

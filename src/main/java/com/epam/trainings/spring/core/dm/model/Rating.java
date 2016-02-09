@@ -16,12 +16,11 @@ public enum Rating {
 
     @Override
     public String toString() {
-        String rating = "LOW";
         if (this == Rating.HIGH) {
-            rating = "HIGH";
+            return "HIGH";
         } else if (this == Rating.MID) {
-            rating = "MID";
+            return "MID";
         }
-        return "Rating{" + rating + "}";
+        return "LOW";
     }
 }

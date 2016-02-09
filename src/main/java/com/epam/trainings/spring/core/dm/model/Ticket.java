@@ -1,16 +1,14 @@
 package com.epam.trainings.spring.core.dm.model;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Ticket {
 
     private long id;
-    private long eventId;
-    private LocalDateTime eventDateTime;
+    private long assignedEventId;
     private Long userId;
-    private Set<Seat> seats;
+    private Set<Integer> seats;
     private double finalPrice;
 
     public long getId() {
@@ -29,27 +27,19 @@ public class Ticket {
         this.userId = userId;
     }
 
-    public long getEventId() {
-        return eventId;
+    public long getAssignedEventId() {
+        return assignedEventId;
     }
 
-    public void setEventId(long eventId) {
-        this.eventId = eventId;
+    public void setAssignedEventId(long eventId) {
+        this.assignedEventId = eventId;
     }
 
-    public LocalDateTime getEventDateTime() {
-        return eventDateTime;
-    }
-
-    public void setEventDateTime(LocalDateTime eventDateTime) {
-        this.eventDateTime = eventDateTime;
-    }
-
-    public Set<Seat> getSeats() {
+    public Set<Integer> getSeats() {
         return new HashSet<>(seats);
     }
 
-    public void setSeats(Set<Seat> seats) {
+    public void setSeats(Set<Integer> seats) {
         this.seats = seats;
     }
 
@@ -75,7 +65,7 @@ public class Ticket {
         if (id != ticket.id) {
             return false;
         }
-        if (eventId != ticket.eventId) {
+        if (assignedEventId != ticket.assignedEventId) {
             return false;
         }
         if (Double.compare(ticket.finalPrice, finalPrice) != 0) {
@@ -93,7 +83,7 @@ public class Ticket {
         int result;
         long temp;
         result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (int) (eventId ^ (eventId >>> 32));
+        result = 31 * result + (int) (assignedEventId ^ (assignedEventId >>> 32));
         result = 31 * result + (userId != null ? userId.hashCode() : 0);
         result = 31 * result + (seats != null ? seats.hashCode() : 0);
         temp = Double.doubleToLongBits(finalPrice);
@@ -104,12 +94,11 @@ public class Ticket {
     @Override
     public String toString() {
         return "Ticket{" +
-               "id=" + id +
-               ", eventId=" + eventId +
-               ", eventDateTime=" + eventDateTime +
-               ", userId=" + userId +
-               ", seats=" + seats +
-               ", finalPrice=" + finalPrice +
-               '}';
+                "id=" + id +
+                ", eventId=" + assignedEventId +
+                ", userId=" + userId +
+                ", seats=" + seats +
+                ", finalPrice=" + finalPrice +
+                '}';
     }
 }

@@ -17,8 +17,8 @@ class TestAuditoriumService {
     void init() {
         def context = new GenericGroovyApplicationContext("classpath:context.groovy");
 
-        auditorium1 = createAuditorium "testAuditoriumB", 15, [11, 12, 13, 14, 15] as Set
-        auditorium2 = createAuditorium "testAuditoriumC", 10, [1, 2, 3, 4, 5] as Set
+        auditorium1 = createAuditorium "testAuditoriumB", 15, [11, 12, 13, 14, 15]
+        auditorium2 = createAuditorium "testAuditoriumC", 10, [1, 2, 3, 4, 5]
         auditoriumService = context.getBean AuditoriumService
     }
 

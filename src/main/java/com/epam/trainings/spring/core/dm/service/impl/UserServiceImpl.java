@@ -1,6 +1,6 @@
 package com.epam.trainings.spring.core.dm.service.impl;
 
-import com.epam.trainings.spring.core.dm.dao.TicketDao;
+import com.epam.trainings.spring.core.dm.dao.TicketsDao;
 import com.epam.trainings.spring.core.dm.dao.UserDao;
 import com.epam.trainings.spring.core.dm.exceptions.service.AlreadyExistsException;
 import com.epam.trainings.spring.core.dm.model.Ticket;
@@ -12,7 +12,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private UserDao userDao;
-    private TicketDao ticketDao;
+    private TicketsDao ticketsDao;
 
     @Override
     public void register(User user) {
@@ -24,6 +24,11 @@ public class UserServiceImpl implements UserService {
             throw new AlreadyExistsException();
         }
         userDao.add(user);
+    }
+
+    @Override
+    public List<User> getAll() {
+        return userDao.findAll();
     }
 
     @Override
@@ -62,14 +67,14 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new IllegalArgumentException();
         }
-        return ticketDao.findByUserId(id);
+        return ticketsDao.findByUserId(id);
     }
 
     public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
     }
 
-    public void setTicketDao(TicketDao ticketDao) {
-        this.ticketDao = ticketDao;
+    public void setTicketsDao(TicketsDao ticketsDao) {
+        this.ticketsDao = ticketsDao;
     }
 }

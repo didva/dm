@@ -1,19 +1,15 @@
 package com.epam.trainings.spring.core.dm.dao.impl.inmemory;
 
-import com.epam.trainings.spring.core.dm.dao.TicketDao;
+import com.epam.trainings.spring.core.dm.dao.TicketsDao;
 import com.epam.trainings.spring.core.dm.model.Ticket;
 import com.epam.trainings.spring.core.dm.model.User;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class TicketDaoInMemoryImpl implements TicketDao {
+public class TicketsDaoInMemoryImpl implements TicketsDao {
 
+    private long count = 0;
     private Map<Long, List<Ticket>> tickets = new HashMap<>();
 
     @Override
@@ -31,19 +27,20 @@ public class TicketDaoInMemoryImpl implements TicketDao {
             tickets.put(userId, ticketsForUser);
         }
         ticketsForUser.add(ticket);
+        ++count;
+        ticket.setId(count);
     }
 
     @Override
-    public List<Ticket> findByEvent(long eventId, LocalDateTime dateTime) {
+    public List<Ticket> findByEvent(long assignedEventId) {
         List<Ticket> matched = new ArrayList<>();
         for (List<Ticket> userTickets : tickets.values()) {
-            matched.addAll(findByEventForUser(userTickets, eventId, dateTime));
+            matched.addAll(findByEventForUser(userTickets, assignedEventId));
         }
         return matched;
     }
 
-    private List<Ticket> findByEventForUser(List<Ticket> uTickets, long eventId, LocalDateTime dateTime) {
-        return uTickets.stream().filter(t -> t.getEventId() == eventId && t.getEventDateTime().equals(dateTime))
-                .collect(Collectors.toList());
+    private List<Ticket> findByEventForUser(List<Ticket> uTickets, long assignedEventId) {
+        return uTickets.stream().filter(t -> t.getAssignedEventId() == assignedEventId).collect(Collectors.toList());
     }
 }

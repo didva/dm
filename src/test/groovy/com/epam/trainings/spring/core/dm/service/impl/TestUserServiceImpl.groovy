@@ -1,7 +1,7 @@
 package com.epam.trainings.spring.core.dm.service.impl
 
 import com.epam.trainings.spring.core.dm.Utils
-import com.epam.trainings.spring.core.dm.dao.TicketDao
+import com.epam.trainings.spring.core.dm.dao.TicketsDao
 import com.epam.trainings.spring.core.dm.dao.UserDao
 import com.epam.trainings.spring.core.dm.exceptions.service.AlreadyExistsException
 import com.epam.trainings.spring.core.dm.model.User
@@ -18,15 +18,15 @@ class TestUserServiceImpl {
     UserServiceImpl userService;
     User user;
     UserDao userDao
-    TicketDao ticketDao
+    TicketsDao ticketDao
 
     @Before
     void init() {
         userDao = mock(UserDao.class)
-        ticketDao = mock(TicketDao.class)
+        ticketDao = mock(TicketsDao.class)
         userService = UserServiceImpl.newInstance()
         userService.userDao = userDao;
-        userService.ticketDao = ticketDao;
+        userService.ticketsDao = ticketDao;
 
         user = Utils.createUser(0, "test_name", "test_email", LocalDate.now());
     }
@@ -114,9 +114,17 @@ class TestUserServiceImpl {
     }
 
     @Test
+    void testGetAll() {
+        def users = [user, Utils.createUser(2, "test_name", "email2", LocalDate.now())]
+        when(userDao.findAll()).thenReturn(users)
+
+        assert users == userService.getAll()
+    }
+
+    @Test
     void testGetBookedTickets() {
         final long userId = 1
-        def tickets = [createTicket(1, 1, null, null, null, 0), createTicket(2, 1, null, null, null, 0)]
+        def tickets = [createTicket(1, 1, null, null, 0), createTicket(2, 1, null, null, 0)]
         when(userDao.find(userId)).thenReturn(user)
         when(ticketDao.findByUserId(userId)).thenReturn(tickets)
 

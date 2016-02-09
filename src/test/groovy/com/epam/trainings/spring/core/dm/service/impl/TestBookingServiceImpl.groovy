@@ -1,7 +1,7 @@
 package com.epam.trainings.spring.core.dm.service.impl
 
 import com.epam.trainings.spring.core.dm.dao.AssignedEventsDao
-import com.epam.trainings.spring.core.dm.dao.TicketDao
+import com.epam.trainings.spring.core.dm.dao.TicketsDao
 import com.epam.trainings.spring.core.dm.exceptions.service.AlreadyExistsException
 import com.epam.trainings.spring.core.dm.model.*
 import com.epam.trainings.spring.core.dm.service.AuditoriumService
@@ -21,31 +21,32 @@ class TestBookingServiceImpl {
 
     DiscountService discountService
     AuditoriumService auditoriumService
-    TicketDao ticketDao
+    TicketsDao ticketDao
     AssignedEventsDao assignedEventsDao
 
     Event event
     Ticket ticket
     User user
-    Seat seat
     Auditorium auditorium
     AssignedEvent assignedEvent
+    Integer seat
 
     @Before
     void init() {
         discountService = mock DiscountService
         auditoriumService = mock AuditoriumService
         assignedEventsDao = mock AssignedEventsDao
-        ticketDao = mock(TicketDao.class)
+        ticketDao = mock(TicketsDao.class)
+
         event = createEvent "e1", 100, Rating.HIGH
-        auditorium = createAuditorium("auditorium1", 10, [3, 4, 5] as Set)
+        auditorium = createAuditorium "auditorium1", 10, [3, 4, 5]
         user = createUser 1, "u1", "email", LocalDate.now()
-        seat = createSeat 1, 1, false, auditorium.name
-        ticket = createTicket 1, event.id, LocalDateTime.now(), null, [seat], 0
-        assignedEvent = createAssignedEvent event, auditorium, ticket.eventDateTime
+        assignedEvent = createAssignedEvent event.id, auditorium.name, LocalDateTime.now()
+        seat = 1
+        ticket = createTicket 1, assignedEvent.id, null, [seat], 0
 
         bookingService = BookingServiceImpl.newInstance()
-        bookingService.ticketDao = ticketDao
+        bookingService.ticketsDao = ticketDao
         bookingService.discountService = discountService
         bookingService.auditoriumService = auditoriumService
         bookingService.assignedEventsDao = assignedEventsDao
@@ -53,7 +54,7 @@ class TestBookingServiceImpl {
 
     @Test
     void testGetPrice() {
-        def discountInPercentage = 0.5D, seats = [createSeat(2, 2, false, auditorium.name), createSeat(3, 3, true, auditorium.name)],
+        def discountInPercentage = 0.5D, seats = [2, 3],
             dateTime = LocalDateTime.now(), totalPrice = discountInPercentage * event.rating.multiplier * (event.price + event.price * 2)
         when(discountService.getDiscount(user, event, dateTime)).thenReturn discountInPercentage * event.price
         when(assignedEventsDao.findByEvent(event.id, dateTime)).thenReturn assignedEvent
@@ -70,7 +71,7 @@ class TestBookingServiceImpl {
 
     @Test(expected = IllegalArgumentException)
     void testGetPriceForNonExistingSeat() {
-        seat.number = 100
+        seat = auditorium.seatsNumber + 1
         def seats = [seat], dateTime = LocalDateTime.now()
         when(assignedEventsDao.findByEvent(event.id, dateTime)).thenReturn assignedEvent
         when(auditoriumService.getAuditorium(auditorium.name)).thenReturn auditorium
@@ -80,10 +81,10 @@ class TestBookingServiceImpl {
 
     @Test(expected = AlreadyExistsException)
     void testGetPriceForAlreadyBooked() {
-        def seats = [seat], dateTime = LocalDateTime.now(), bookedTicket = createTicket(1, event.id, dateTime, null, [seat], 0)
+        def seats = [seat], dateTime = LocalDateTime.now(), bookedTicket = createTicket(1, assignedEvent.id, null, [seat], 0)
         when(assignedEventsDao.findByEvent(event.id, dateTime)).thenReturn assignedEvent
         when(auditoriumService.getAuditorium(auditorium.name)).thenReturn auditorium
-        when(ticketDao.findByEvent(event.id, dateTime)).thenReturn([bookedTicket])
+        when(ticketDao.findByEvent(assignedEvent.id)).thenReturn([bookedTicket])
 
         bookingService.getTicketPrice event, dateTime, seats as Set, user
     }
@@ -105,8 +106,8 @@ class TestBookingServiceImpl {
 
     @Test
     void testBookTicket() {
-        when(assignedEventsDao.findByEvent(event.id, ticket.eventDateTime)).thenReturn assignedEvent
-        when(ticketDao.findByEvent(event.id, ticket.eventDateTime)).thenReturn Collections.emptyList()
+        when(assignedEventsDao.find(assignedEvent.id)).thenReturn assignedEvent
+        when(ticketDao.findByEvent(assignedEvent.id)).thenReturn Collections.emptyList()
         when(auditoriumService.getAuditorium(auditorium.name)).thenReturn auditorium
 
         bookingService.bookTicket user, ticket
@@ -115,15 +116,15 @@ class TestBookingServiceImpl {
 
     @Test(expected = IllegalArgumentException)
     void testBookTicketForNonExistingEvent() {
-        when(assignedEventsDao.findByEvent(event.id, ticket.eventDateTime)).thenReturn null
+        when(assignedEventsDao.findByEvent(event.id, assignedEvent.dateTime)).thenReturn null
         bookingService.bookTicket user, ticket
     }
 
     @Test(expected = AlreadyExistsException)
     void testBookTicketForBookedSeats() {
-        def bookedTicket = createTicket(1, event.id, ticket.eventDateTime, null, [seat], 0)
-        when(assignedEventsDao.findByEvent(event.id, ticket.eventDateTime)).thenReturn assignedEvent
-        when(ticketDao.findByEvent(event.id, ticket.eventDateTime)).thenReturn([bookedTicket])
+        def bookedTicket = createTicket(1, assignedEvent.id, null, [seat], 0)
+        when(assignedEventsDao.find(assignedEvent.id)).thenReturn assignedEvent
+        when(ticketDao.findByEvent(assignedEvent.id)).thenReturn([bookedTicket])
         when(auditoriumService.getAuditorium(auditorium.name)).thenReturn auditorium
 
         bookingService.bookTicket user, ticket
@@ -131,10 +132,10 @@ class TestBookingServiceImpl {
 
     @Test(expected = IllegalArgumentException)
     void testBookTicketNonExistingSeat() {
-        seat.number = auditorium.seatsNumber + 1
-        def ticket = createTicket(1, event.id, ticket.eventDateTime, null, [seat], 0)
-        when(assignedEventsDao.findByEvent(event.id, ticket.eventDateTime)).thenReturn assignedEvent
-        when(ticketDao.findByEvent(event.id, ticket.eventDateTime)).thenReturn Collections.emptyList()
+        seat = auditorium.seatsNumber + 1
+        def ticket = createTicket(1, assignedEvent.id, null, [seat], 0)
+        when(assignedEventsDao.findByEvent(event.id, assignedEvent.dateTime)).thenReturn assignedEvent
+        when(ticketDao.findByEvent(assignedEvent.id)).thenReturn Collections.emptyList()
         when(auditoriumService.getAuditorium(auditorium.name)).thenReturn auditorium
 
         bookingService.bookTicket user, ticket
@@ -148,7 +149,7 @@ class TestBookingServiceImpl {
     @Test
     void testGetTicketsForEvent() {
         def dateTime = LocalDateTime.now(), tickets = [ticket]
-        when(ticketDao.findByEvent(event.id, dateTime)).thenReturn tickets
+        when(ticketDao.findByEvent(assignedEvent.id)).thenReturn tickets
         when(assignedEventsDao.findByEvent(event.id, dateTime)).thenReturn assignedEvent
 
         assert tickets == bookingService.getTicketsForEvent(event, dateTime)

@@ -25,7 +25,4 @@ public class BirthdayDiscountStrategy implements DiscountService.DiscountStrateg
         this.discountPercentage = discountPercentage;
     }
 
-    public double getDiscountPercentage() {
-        return discountPercentage;
-    }
 }

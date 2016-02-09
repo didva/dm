@@ -9,6 +9,8 @@ public interface UserService {
 
     void register(User user);
 
+    List<User> getAll();
+
     void remove(long id);
 
     User getById(long id);

@@ -1,6 +1,6 @@
 package com.epam.trainings.spring.core.dm.service.impl.strategies
 
-import com.epam.trainings.spring.core.dm.dao.TicketDao
+import com.epam.trainings.spring.core.dm.dao.TicketsDao
 import com.epam.trainings.spring.core.dm.model.Rating
 import org.junit.Before
 import org.junit.Test
@@ -18,15 +18,15 @@ class TestNthMultipleDiscountStrategy {
     NthMultipleTicketDiscountStrategy discountStrategy
     double discountPercentage = 0.5
     double ticketsToDiscount = 2
-    TicketDao ticketDao
+    TicketsDao ticketDao
 
     @Before
     void init() {
-        ticketDao = mock(TicketDao.class)
+        ticketDao = mock(TicketsDao.class)
 
         discountStrategy = NthMultipleTicketDiscountStrategy.newInstance()
         discountStrategy.discountPercentage = discountPercentage
-        discountStrategy.ticketDao = ticketDao
+        discountStrategy.ticketsDao = ticketDao
         discountStrategy.ticketsToDiscount = ticketsToDiscount
     }
 
@@ -35,7 +35,7 @@ class TestNthMultipleDiscountStrategy {
         def price = 100, discount = 50D, dateTime = LocalDateTime.now(),
             user = createUser(1, "name", "email", dateTime.toLocalDate()),
             event = createEvent("eName", price, Rating.HIGH),
-            tickets = [createTicket(1, 1, null, null, null, 0)]
+            tickets = [createTicket(1, 1, null, null, 0)]
         when(ticketDao.findByUserId(user.id)).thenReturn(tickets)
 
         assert discount == discountStrategy.getDiscount(user, event, dateTime)

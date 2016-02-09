@@ -68,7 +68,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<AssignedEvent> getForDateRange(LocalDateTime from, LocalDateTime to) {
-        if (from == null || to == null) {
+        if (from == null || to == null || !from.isBefore(to)) {
             throw new IllegalArgumentException();
         }
         return assignedEventsDao.findByRange(from, to);
@@ -87,7 +87,13 @@ public class EventServiceImpl implements EventService {
         if (eventDao.find(event.getId()) == null) {
             throw new IllegalArgumentException();
         }
-        assignedEventsDao.assignAuditorium(new AssignedEvent(event, auditorium, dateTime));
+        if (assignedEventsDao.findByEvent(event.getId(), dateTime) != null) {
+            throw new AlreadyExistsException();
+        }
+        if (assignedEventsDao.findByAuditorium(auditorium.getName(), dateTime) != null) {
+            throw new AlreadyExistsException();
+        }
+        assignedEventsDao.assignAuditorium(new AssignedEvent(event.getId(), auditorium.getName(), dateTime));
     }
 
     public void setEventDao(EventDao eventDao) {
