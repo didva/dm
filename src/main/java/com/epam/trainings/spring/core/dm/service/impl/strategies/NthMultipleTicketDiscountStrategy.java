@@ -1,5 +1,6 @@
 package com.epam.trainings.spring.core.dm.service.impl.strategies;
 
+import com.epam.trainings.spring.core.dm.annotations.TrackDiscount;
 import com.epam.trainings.spring.core.dm.dao.TicketsDao;
 import com.epam.trainings.spring.core.dm.model.Event;
 import com.epam.trainings.spring.core.dm.model.Ticket;
@@ -16,6 +17,7 @@ public class NthMultipleTicketDiscountStrategy implements DiscountService.Discou
     private TicketsDao ticketsDao;
 
     @Override
+    @TrackDiscount(name = "Nth Ticket Discount")
     public double getDiscount(User user, Event event, LocalDateTime dateTime) {
         if (event == null) {
             throw new IllegalArgumentException();

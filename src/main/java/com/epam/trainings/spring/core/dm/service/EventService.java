@@ -1,5 +1,6 @@
 package com.epam.trainings.spring.core.dm.service;
 
+import com.epam.trainings.spring.core.dm.annotations.TrackMethodExecutions;
 import com.epam.trainings.spring.core.dm.model.AssignedEvent;
 import com.epam.trainings.spring.core.dm.model.Auditorium;
 import com.epam.trainings.spring.core.dm.model.Event;
@@ -13,6 +14,7 @@ public interface EventService {
 
     void remove(long id);
 
+    @TrackMethodExecutions(description = "Search event by name")
     Event getByName(String name);
 
     List<Event> getAll();

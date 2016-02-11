@@ -1,5 +1,6 @@
 package com.epam.trainings.spring.core.dm.service.impl.strategies;
 
+import com.epam.trainings.spring.core.dm.annotations.TrackDiscount;
 import com.epam.trainings.spring.core.dm.model.Event;
 import com.epam.trainings.spring.core.dm.model.User;
 import com.epam.trainings.spring.core.dm.service.DiscountService;
@@ -11,6 +12,7 @@ public class BirthdayDiscountStrategy implements DiscountService.DiscountStrateg
     private double discountPercentage;
 
     @Override
+    @TrackDiscount(name = "Birthday Discount")
     public double getDiscount(User user, Event event, LocalDateTime dateTime) {
         if (dateTime == null || event == null) {
             throw new IllegalArgumentException();
