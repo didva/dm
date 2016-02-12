@@ -19,6 +19,8 @@ public interface EventService {
 
     List<Event> getAll();
 
+    Event getById(long eventId);
+
     AssignedEvent getAssignedEvent(long eventId, LocalDateTime dateTime);
 
     List<AssignedEvent> getAllAssignedEvents();

@@ -59,7 +59,7 @@ public class AppServiceConfig {
     public BookingService bookingService() {
         BookingServiceImpl bookingService = new BookingServiceImpl();
         bookingService.setTicketsDao(ticketsDao);
-        bookingService.setAssignedEventsDao(assignedEventsDao);
+        bookingService.setEventService(eventService());
         bookingService.setAuditoriumService(auditoriumService());
         bookingService.setDiscountService(discountService());
         return bookingService;

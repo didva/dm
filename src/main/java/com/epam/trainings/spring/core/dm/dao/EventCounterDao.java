@@ -6,6 +6,6 @@ public interface EventCounterDao {
 
     void increase(long eventId);
 
-    Counter<Long> findByItemId(long eventId);
+    Counter<Long> findByEventId(long eventId);
 
 }

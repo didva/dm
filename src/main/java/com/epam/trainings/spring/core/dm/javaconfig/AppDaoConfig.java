@@ -41,4 +41,19 @@ public class AppDaoConfig {
         return new AssignedEventsDaoInMemoryImpl();
     }
 
+    @Bean
+    public EventCounterDao eventByNameAccessionsCounterDao() {
+        return new GeneralEventCounterDaoInMemoryImpl();
+    }
+
+    @Bean
+    public EventCounterDao eventPriceCalculationsCounterDao() {
+        return new GeneralEventCounterDaoInMemoryImpl();
+    }
+
+    @Bean
+    public EventCounterDao eventTicketsBookingsCounterDao() {
+        return new GeneralEventCounterDaoInMemoryImpl();
+    }
+
 }

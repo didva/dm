@@ -1,7 +1,9 @@
+import com.epam.trainings.spring.core.dm.aspects.EventsStatisticAspect
 import com.epam.trainings.spring.core.dm.dao.impl.inmemory.*
 import com.epam.trainings.spring.core.dm.service.impl.*
 import com.epam.trainings.spring.core.dm.service.impl.strategies.BirthdayDiscountStrategy
 import com.epam.trainings.spring.core.dm.service.impl.strategies.NthMultipleTicketDiscountStrategy
+import org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator
 import org.springframework.core.io.ClassPathResource
 
 beans {
@@ -17,6 +19,9 @@ beans {
     eventDao(EventDaoInMemoryImpl)
     ticketsDao(TicketsDaoInMemoryImpl)
     userDao(UserDaoInMemoryImpl)
+    eventByNameAccessionsCounterDao(GeneralEventCounterDaoInMemoryImpl)
+    eventPriceCalculationsCounterDao(GeneralEventCounterDaoInMemoryImpl)
+    eventTicketsBookingsCounterDao(GeneralEventCounterDaoInMemoryImpl)
     // DAOs end
 
     // Services start
@@ -38,15 +43,29 @@ beans {
     discountService(DiscountServiceImpl) {
         strategies = [ref('nthMultipleTicketDiscountStrategy'), ref('birthdayDiscountStrategy')]
     }
-    bookingService(BookingServiceImpl) {
-        discountService = ref('discountService')
-        ticketsDao = ref('ticketsDao')
-        assignedEventsDao = ref('assignedEventsDao')
-        auditoriumService = ref('auditoriumService')
-    }
-    eventServive(EventServiceImpl) {
+    eventService(EventServiceImpl) {
         eventDao = ref('eventDao')
         assignedEventsDao = ref('assignedEventsDao')
     }
+    bookingService(BookingServiceImpl) {
+        discountService = ref('discountService')
+        ticketsDao = ref('ticketsDao')
+        eventService = ref('eventService')
+        auditoriumService = ref('auditoriumService')
+    }
+    eventsStatisticService(EventsStatisticServiceImpl) {
+        eventByNameAccessionsCounterDao = ref('eventByNameAccessionsCounterDao')
+        eventPriceCalculationsCounterDao = ref('eventPriceCalculationsCounterDao')
+        eventTicketsBookingsCounterDao = ref('eventTicketsBookingsCounterDao')
+    }
     // Services end
+
+    // Aspects start
+    autoProxyCreator(AnnotationAwareAspectJAutoProxyCreator) {
+        proxyTargetClass = false
+    }
+    eventsStatiscticApect(EventsStatisticAspect) {
+        eventsStatisticService = ref('eventsStatisticService')
+    }
+    // Aspects end
 }

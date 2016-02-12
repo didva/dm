@@ -20,7 +20,7 @@ sourceSets {
     test {
         groovy.srcDir file('src/test/groovy')
         if(System.properties.'idea.active') {
-            resources.srcDirs = [file('src/integTest/resources')]
+            resources.srcDirs = [file('src/integTest/resources'), file('src/test/resources')]
         }
     }
 }
@@ -35,13 +35,20 @@ task integTest(type: Test) {
     classpath = sourceSets.integTest.runtimeClasspath
 }
 
+tasks.withType(Test) {
+    reports.html.destination = file("${reporting.baseDir}/${name}")
+}
+
 dependencies {
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'org.springframework:spring-context:4.2.4.RELEASE'
+    compile 'org.springframework:spring-aop:4.2.4.RELEASE'
+    compile 'org.aspectj:aspectjrt:1.8.8'
+    compile 'org.aspectj:aspectjweaver:1.8.8'
     testCompile 'org.codehaus.groovy:groovy-all:2.3.11'
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-all:1.8.4'
-    integTestCompile 'org.springframework:spring-test:4.2.4.RELEASE'
+    testCompile 'org.springframework:spring-test:4.2.4.RELEASE'
 }
 
 check.dependsOn integTest

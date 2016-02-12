@@ -1,12 +1,16 @@
 package com.epam.trainings.spring.core.dm.service.impl;
 
-import com.epam.trainings.spring.core.dm.dao.AssignedEventsDao;
 import com.epam.trainings.spring.core.dm.dao.TicketsDao;
 import com.epam.trainings.spring.core.dm.exceptions.service.AlreadyExistsException;
-import com.epam.trainings.spring.core.dm.model.*;
+import com.epam.trainings.spring.core.dm.model.AssignedEvent;
+import com.epam.trainings.spring.core.dm.model.Auditorium;
+import com.epam.trainings.spring.core.dm.model.Event;
+import com.epam.trainings.spring.core.dm.model.Ticket;
+import com.epam.trainings.spring.core.dm.model.User;
 import com.epam.trainings.spring.core.dm.service.AuditoriumService;
 import com.epam.trainings.spring.core.dm.service.BookingService;
 import com.epam.trainings.spring.core.dm.service.DiscountService;
+import com.epam.trainings.spring.core.dm.service.EventService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,18 +20,18 @@ public class BookingServiceImpl implements BookingService {
 
     private DiscountService discountService;
     private TicketsDao ticketsDao;
-    private AssignedEventsDao assignedEventsDao;
     private AuditoriumService auditoriumService;
+    private EventService eventService;
 
     @Override
-    public double getTicketPrice(Event event, LocalDateTime dateTime, Set<Integer> seats, User user) {
-        if (event == null || dateTime == null || seats == null || seats.isEmpty()) {
+    public double getTicketPrice(AssignedEvent assignedEvent, Set<Integer> seats, User user) {
+        if (assignedEvent == null || seats == null || seats.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        AssignedEvent assignedEvent = assignedEventsDao.findByEvent(event.getId(), dateTime);
-        if (assignedEvent == null) {
-            throw new IllegalArgumentException();
+        Event event = eventService.getById(assignedEvent.getEventId());
+        if (event == null) {
+            throw new IllegalStateException();
         }
         Auditorium auditorium = auditoriumService.getAuditorium(assignedEvent.getAuditorium());
         if (auditorium == null) {
@@ -40,36 +44,29 @@ public class BookingServiceImpl implements BookingService {
             throw new AlreadyExistsException();
         }
 
-        double totalPrice = 0, discount = discountService.getDiscount(user, event, dateTime),
-                seatPrice = event.getPrice() - discount;
-        Set<Integer> vipSeats = auditorium.getVipSeats();
-        for (Integer seat : seats) {
-            totalPrice += vipSeats.contains(seat) ? seatPrice * 2 : seatPrice;
-        }
-        return totalPrice * event.getRating().getMultiplier();
+        return calculatePrice(event, assignedEvent.getDateTime(), seats, user, auditorium);
     }
 
     @Override
-    public void bookTicket(User user, Ticket ticket) {
-        if (ticket == null || ticket.getSeats() == null || ticket.getSeats().isEmpty()) {
-            throw new IllegalArgumentException();
-        }
-
-        AssignedEvent assignedEvent = assignedEventsDao.find(ticket.getAssignedEventId());
-        if (assignedEvent == null) {
+    public void bookTicket(AssignedEvent assignedEvent, Set<Integer> seats, User user) {
+        if (assignedEvent == null || seats == null || seats.isEmpty()) {
             throw new IllegalArgumentException();
         }
         Auditorium auditorium = auditoriumService.getAuditorium(assignedEvent.getAuditorium());
         if (auditorium == null) {
             throw new IllegalStateException();
         }
-        if (!seatsAreCorrect(auditorium, ticket.getSeats())) {
+        if (!seatsAreCorrect(auditorium, seats)) {
             throw new IllegalArgumentException();
         }
-        if (seatsAreBooked(ticket.getSeats(), assignedEvent.getId())) {
+        if (seatsAreBooked(seats, assignedEvent.getId())) {
             throw new AlreadyExistsException();
         }
-
+        Event event = eventService.getById(assignedEvent.getEventId());
+        if (event == null) {
+            throw new IllegalStateException();
+        }
+        Ticket ticket = getTicket(event, assignedEvent, user, seats, auditorium);
         ticketsDao.add(user, ticket);
     }
 
@@ -78,7 +75,7 @@ public class BookingServiceImpl implements BookingService {
         if (event == null || dateTime == null) {
             throw new IllegalArgumentException();
         }
-        AssignedEvent assignedEvent = assignedEventsDao.findByEvent(event.getId(), dateTime);
+        AssignedEvent assignedEvent = eventService.getAssignedEvent(event.getId(), dateTime);
         if (assignedEvent == null) {
             throw new IllegalArgumentException();
         }
@@ -98,6 +95,26 @@ public class BookingServiceImpl implements BookingService {
         return true;
     }
 
+    private Ticket getTicket(Event event, AssignedEvent assignedEvent, User user, Set<Integer> seats, Auditorium auditorium) {
+        Ticket ticket = new Ticket();
+        ticket.setAssignedEventId(assignedEvent.getId());
+        assignedEvent.getAuditorium();
+        ticket.setFinalPrice(calculatePrice(event, assignedEvent.getDateTime(), seats, user, auditorium));
+        ticket.setSeats(seats);
+        ticket.setUserId(user == null ? null : user.getId());
+        return ticket;
+    }
+
+    private double calculatePrice(Event event, LocalDateTime dateTime, Set<Integer> seats, User user, Auditorium auditorium) {
+        double totalPrice = 0, discount = discountService.getDiscount(user, event, dateTime),
+                seatPrice = event.getPrice() - discount;
+        Set<Integer> vipSeats = auditorium.getVipSeats();
+        for (Integer seat : seats) {
+            totalPrice += vipSeats.contains(seat) ? seatPrice * 2 : seatPrice;
+        }
+        return totalPrice * event.getRating().getMultiplier();
+    }
+
     public void setDiscountService(DiscountService discountService) {
         this.discountService = discountService;
     }
@@ -106,8 +123,8 @@ public class BookingServiceImpl implements BookingService {
         this.ticketsDao = ticketsDao;
     }
 
-    public void setAssignedEventsDao(AssignedEventsDao assignedEventsDao) {
-        this.assignedEventsDao = assignedEventsDao;
+    public void setEventService(EventService eventService) {
+        this.eventService = eventService;
     }
 
     public void setAuditoriumService(AuditoriumService auditoriumService) {

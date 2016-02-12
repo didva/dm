@@ -3,7 +3,6 @@ package com.epam.trainings.spring.core.dm.ui.menus.console;
 import com.epam.trainings.spring.core.dm.exceptions.service.AlreadyExistsException;
 import com.epam.trainings.spring.core.dm.model.AssignedEvent;
 import com.epam.trainings.spring.core.dm.model.Event;
-import com.epam.trainings.spring.core.dm.model.Ticket;
 import com.epam.trainings.spring.core.dm.model.User;
 import com.epam.trainings.spring.core.dm.service.AuditoriumService;
 import com.epam.trainings.spring.core.dm.service.BookingService;
@@ -82,22 +81,11 @@ public class UserMenu implements Menu {
         int seatsNumber = auditoriumService.getAuditorium(assignedEvent.getAuditorium()).getSeatsNumber();
         Set<Integer> seats = readSeatsInformation(seatsNumber);
         try {
-            Ticket ticket = getTicket(event, dateTime, assignedEvent, user, seats);
-            bookingService.bookTicket(user, ticket);
+            bookingService.bookTicket(assignedEvent, seats, user);
         } catch (AlreadyExistsException e) {
             System.out.println("Sorry, this seats already booked!");
         }
 
-    }
-
-    private Ticket getTicket(Event event, LocalDateTime dateTime, AssignedEvent assignedEvent, User user,
-                             Set<Integer> seats) {
-        Ticket ticket = new Ticket();
-        ticket.setAssignedEventId(assignedEvent.getId());
-        ticket.setFinalPrice(bookingService.getTicketPrice(event, dateTime, seats, user));
-        ticket.setSeats(seats);
-        ticket.setUserId(user == null ? null : user.getId());
-        return ticket;
     }
 
     private void getTicketPrice() {
@@ -119,7 +107,7 @@ public class UserMenu implements Menu {
         }
         int seatsNumber = auditoriumService.getAuditorium(assignedEvent.getAuditorium()).getSeatsNumber();
         Set<Integer> seats = readSeatsInformation(seatsNumber);
-        System.out.println("Price is: " + bookingService.getTicketPrice(event, dateTime, seats, user));
+        System.out.println("Price is: " + bookingService.getTicketPrice(assignedEvent, seats, user));
     }
 
     private Set<Integer> readSeatsInformation(int seatsNumber) {

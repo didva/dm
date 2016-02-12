@@ -50,6 +50,11 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public Event getById(long eventId) {
+        return eventDao.find(eventId);
+    }
+
+    @Override
     public AssignedEvent getAssignedEvent(long eventId, LocalDateTime dateTime) {
         if (dateTime == null) {
             throw new IllegalArgumentException();

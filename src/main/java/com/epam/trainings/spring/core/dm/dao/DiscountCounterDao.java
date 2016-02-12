@@ -6,8 +6,8 @@ public interface DiscountCounterDao {
 
     void increase(String discountName, long userId);
 
-    Counter<Long> findByDiscountName(String discountName);
+    Counter<String> findByDiscountName(String discountName);
 
-    Counter<String> findByUserId(long userId);
+    Counter<Long> findByUserId(long userId);
 
 }

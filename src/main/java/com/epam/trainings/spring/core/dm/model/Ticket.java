@@ -62,9 +62,6 @@ public class Ticket {
 
         Ticket ticket = (Ticket) o;
 
-        if (id != ticket.id) {
-            return false;
-        }
         if (assignedEventId != ticket.assignedEventId) {
             return false;
         }
@@ -80,13 +77,10 @@ public class Ticket {
 
     @Override
     public int hashCode() {
-        int result;
-        long temp;
-        result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (int) (assignedEventId ^ (assignedEventId >>> 32));
+        int result= 31 + (int) (assignedEventId ^ (assignedEventId >>> 32));
         result = 31 * result + (userId != null ? userId.hashCode() : 0);
         result = 31 * result + (seats != null ? seats.hashCode() : 0);
-        temp = Double.doubleToLongBits(finalPrice);
+        long temp = Double.doubleToLongBits(finalPrice);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }

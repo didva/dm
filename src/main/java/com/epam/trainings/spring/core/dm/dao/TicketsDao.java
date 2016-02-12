@@ -9,7 +9,9 @@ import java.util.List;
 
 public interface TicketsDao {
 
-    List<Ticket> findByUserId(long id);
+    Ticket find(long id);
+
+    List<Ticket> findByUserId(long userId);
 
     void add(User user, Ticket ticket);
 

@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd">
+
+    <aop:aspectj-autoproxy/>
 
     <!--Properties Start-->
     <context:property-placeholder location="classpath:config.properties"/>
@@ -14,6 +20,14 @@
     <bean id="assignedEventsDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.AssignedEventsDaoInMemoryImpl"/>
     <bean id="auditoriumDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.AuditoriumDaoInMemoryImpl">
         <constructor-arg value="${auditorium.properties.path}"/>
+    </bean>
+    <bean id="eventByNameAccessionsCounterDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.GeneralEventCounterDaoInMemoryImpl"/>
+    <bean id="eventPriceCalculationsCounterDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.GeneralEventCounterDaoInMemoryImpl"/>
+    <bean id="eventTicketsBookingsCounterDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.GeneralEventCounterDaoInMemoryImpl"/>
+    <bean id="discountCounterDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.DiscountCounterDaoInMemoryImpl"/>
+    <bean id="luckyDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.LuckyDaoInMemoryImpl">
+        <property name="assignedEventsDao" ref="assignedEventsDao"/>
+        <property name="ticketsDao" ref="ticketsDao"/>
     </bean>
     <!--DAOs End-->
 
@@ -37,7 +51,7 @@
     </bean>
     <bean id="bookingService" class="com.epam.trainings.spring.core.dm.service.impl.BookingServiceImpl">
         <property name="ticketsDao" ref="ticketsDao"/>
-        <property name="assignedEventsDao" ref="assignedEventsDao"/>
+        <property name="eventService" ref="eventService"/>
         <property name="auditoriumService" ref="auditoriumService"/>
         <property name="discountService" ref="discountService"/>
     </bean>
@@ -48,6 +62,11 @@
     <bean id="userService" class="com.epam.trainings.spring.core.dm.service.impl.UserServiceImpl">
         <property name="userDao" ref="userDao"/>
         <property name="ticketsDao" ref="ticketsDao"/>
+    </bean>
+    <bean id="eventsStatisticService" class="com.epam.trainings.spring.core.dm.service.impl.EventsStatisticServiceImpl">
+        <property name="eventByNameAccessionsCounterDao" ref="eventByNameAccessionsCounterDao"/>
+        <property name="eventPriceCalculationsCounterDao" ref="eventPriceCalculationsCounterDao"/>
+        <property name="eventTicketsBookingsCounterDao" ref="eventTicketsBookingsCounterDao"/>
     </bean>
     <!--Services End-->
 
@@ -76,4 +95,9 @@
     </bean>
     <!-- UI End-->
 
+    <!-- Aspects Start -->
+    <bean class="com.epam.trainings.spring.core.dm.aspects.EventsStatisticAspect">
+        <property name="eventsStatisticService" ref="eventsStatisticService"/>
+    </bean>
+    <!-- Aspects End -->
 </beans>

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface LuckyDao {
 
-    void register(long eventId, long userId);
+    void register(long ticketId, long userId);
 
     List<LuckyInfo> findByEventId(long eventId);
 

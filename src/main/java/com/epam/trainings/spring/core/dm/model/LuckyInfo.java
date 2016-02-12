@@ -6,6 +6,15 @@ public class LuckyInfo {
     private long userId;
     private long ticketId;
 
+    public LuckyInfo() {
+    }
+
+    public LuckyInfo(long id, long userId, long ticketId) {
+        this.id = id;
+        this.userId = userId;
+        this.ticketId = ticketId;
+    }
+
     public long getId() {
         return id;
     }
