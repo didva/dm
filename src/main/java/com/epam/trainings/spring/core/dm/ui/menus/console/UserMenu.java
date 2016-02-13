@@ -107,7 +107,11 @@ public class UserMenu implements Menu {
         }
         int seatsNumber = auditoriumService.getAuditorium(assignedEvent.getAuditorium()).getSeatsNumber();
         Set<Integer> seats = readSeatsInformation(seatsNumber);
-        System.out.println("Price is: " + bookingService.getTicketPrice(assignedEvent, seats, user));
+        try {
+            System.out.println("Price is: " + bookingService.getTicketPrice(assignedEvent, seats, user));
+        } catch (AlreadyExistsException e) {
+            System.out.println("Sorry, these places already booked!");
+        }
     }
 
     private Set<Integer> readSeatsInformation(int seatsNumber) {

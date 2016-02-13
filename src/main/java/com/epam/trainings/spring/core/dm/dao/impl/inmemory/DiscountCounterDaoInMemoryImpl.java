@@ -3,10 +3,7 @@ package com.epam.trainings.spring.core.dm.dao.impl.inmemory;
 import com.epam.trainings.spring.core.dm.dao.DiscountCounterDao;
 import com.epam.trainings.spring.core.dm.model.Counter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DiscountCounterDaoInMemoryImpl implements DiscountCounterDao {
 
@@ -34,6 +31,9 @@ public class DiscountCounterDaoInMemoryImpl implements DiscountCounterDao {
     @Override
     public List<Counter<String>> findByUserId(long userId) {
         Map<String, Integer> userInfo = statisticsByUser.get(userId);
+        if (userInfo == null) {
+            return Collections.emptyList();
+        }
         List<Counter<String>> statistics = new ArrayList<>();
         userInfo.entrySet().stream().forEach(e -> statistics.add(new Counter<>(e.getKey(), e.getValue())));
         return statistics;

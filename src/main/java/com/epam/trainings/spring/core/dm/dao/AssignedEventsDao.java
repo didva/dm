@@ -1,7 +1,6 @@
 package com.epam.trainings.spring.core.dm.dao;
 
 import com.epam.trainings.spring.core.dm.model.AssignedEvent;
-import com.epam.trainings.spring.core.dm.model.Event;
 
 import java.time.LocalDateTime;
 import java.util.List;

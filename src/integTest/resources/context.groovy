@@ -1,6 +1,5 @@
 import com.epam.trainings.spring.core.dm.aspects.DiscountsStatisticAspect
 import com.epam.trainings.spring.core.dm.aspects.EventsStatisticAspect
-import com.epam.trainings.spring.core.dm.aspects.LuckyAspect
 import com.epam.trainings.spring.core.dm.dao.impl.inmemory.*
 import com.epam.trainings.spring.core.dm.service.impl.*
 import com.epam.trainings.spring.core.dm.service.impl.strategies.BirthdayDiscountStrategy

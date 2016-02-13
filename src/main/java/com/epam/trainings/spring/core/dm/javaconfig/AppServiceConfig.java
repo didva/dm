@@ -111,13 +111,15 @@ public class AppServiceConfig {
         return new RandomGeneratorServiceImpl();
     }
 
-    private DiscountService.DiscountStrategy createBirthdayDiscount() {
+    @Bean
+    public DiscountService.DiscountStrategy createBirthdayDiscount() {
         BirthdayDiscountStrategy birthday = new BirthdayDiscountStrategy();
         birthday.setDiscountPercentage(birthdayDiscount);
         return birthday;
     }
 
-    private DiscountService.DiscountStrategy createNthTicketDiscount() {
+    @Bean
+    public DiscountService.DiscountStrategy createNthTicketDiscount() {
         NthMultipleTicketDiscountStrategy nthMultipleTicketDiscountStrategy = new NthMultipleTicketDiscountStrategy();
         nthMultipleTicketDiscountStrategy.setTicketsDao(ticketsDao);
         nthMultipleTicketDiscountStrategy.setDiscountPercentage(nthTicketDiscount);
