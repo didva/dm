@@ -1,4 +1,6 @@
+import com.epam.trainings.spring.core.dm.aspects.DiscountsStatisticAspect
 import com.epam.trainings.spring.core.dm.aspects.EventsStatisticAspect
+import com.epam.trainings.spring.core.dm.aspects.LuckyAspect
 import com.epam.trainings.spring.core.dm.dao.impl.inmemory.*
 import com.epam.trainings.spring.core.dm.service.impl.*
 import com.epam.trainings.spring.core.dm.service.impl.strategies.BirthdayDiscountStrategy
@@ -22,6 +24,11 @@ beans {
     eventByNameAccessionsCounterDao(GeneralEventCounterDaoInMemoryImpl)
     eventPriceCalculationsCounterDao(GeneralEventCounterDaoInMemoryImpl)
     eventTicketsBookingsCounterDao(GeneralEventCounterDaoInMemoryImpl)
+    discountCounterDao(DiscountCounterDaoInMemoryImpl)
+    luckyDao(LuckyDaoInMemoryImpl) {
+        ticketsDao = ref('ticketsDao')
+        assignedEventsDao = ref('assignedEventsDao')
+    }
     // DAOs end
 
     // Services start
@@ -53,10 +60,12 @@ beans {
         eventService = ref('eventService')
         auditoriumService = ref('auditoriumService')
     }
-    eventsStatisticService(EventsStatisticServiceImpl) {
+    statisticService(StatisticServiceImpl) {
         eventByNameAccessionsCounterDao = ref('eventByNameAccessionsCounterDao')
         eventPriceCalculationsCounterDao = ref('eventPriceCalculationsCounterDao')
         eventTicketsBookingsCounterDao = ref('eventTicketsBookingsCounterDao')
+        discountCounterDao = ref("discountCounterDao")
+        luckyDao = ref("luckyDao")
     }
     // Services end
 
@@ -65,7 +74,10 @@ beans {
         proxyTargetClass = false
     }
     eventsStatiscticApect(EventsStatisticAspect) {
-        eventsStatisticService = ref('eventsStatisticService')
+        statisticService = ref('statisticService')
+    }
+    discountsStatisticAspect(DiscountsStatisticAspect) {
+        statisticService = ref('statisticService')
     }
     // Aspects end
 }

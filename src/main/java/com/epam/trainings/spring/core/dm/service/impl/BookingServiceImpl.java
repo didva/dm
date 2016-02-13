@@ -2,11 +2,7 @@ package com.epam.trainings.spring.core.dm.service.impl;
 
 import com.epam.trainings.spring.core.dm.dao.TicketsDao;
 import com.epam.trainings.spring.core.dm.exceptions.service.AlreadyExistsException;
-import com.epam.trainings.spring.core.dm.model.AssignedEvent;
-import com.epam.trainings.spring.core.dm.model.Auditorium;
-import com.epam.trainings.spring.core.dm.model.Event;
-import com.epam.trainings.spring.core.dm.model.Ticket;
-import com.epam.trainings.spring.core.dm.model.User;
+import com.epam.trainings.spring.core.dm.model.*;
 import com.epam.trainings.spring.core.dm.service.AuditoriumService;
 import com.epam.trainings.spring.core.dm.service.BookingService;
 import com.epam.trainings.spring.core.dm.service.DiscountService;
@@ -44,7 +40,7 @@ public class BookingServiceImpl implements BookingService {
             throw new AlreadyExistsException();
         }
 
-        return calculatePrice(event, assignedEvent.getDateTime(), seats, user, auditorium);
+        return checkPrice(event, assignedEvent.getDateTime(), seats, user, auditorium);
     }
 
     @Override
@@ -105,14 +101,23 @@ public class BookingServiceImpl implements BookingService {
         return ticket;
     }
 
-    private double calculatePrice(Event event, LocalDateTime dateTime, Set<Integer> seats, User user, Auditorium auditorium) {
-        double totalPrice = 0, discount = discountService.getDiscount(user, event, dateTime),
-                seatPrice = event.getPrice() - discount;
+    private double checkPrice(Event event, LocalDateTime dateTime, Set<Integer> seats, User user, Auditorium auditorium) {
+        double discount = discountService.checkDiscount(user, event, dateTime);
+        return getPrice(event, seats, auditorium, discount);
+    }
+
+    private double getPrice(Event event, Set<Integer> seats, Auditorium auditorium, double discount) {
+        double totalPrice = 0, seatPrice = event.getPrice() - discount;
         Set<Integer> vipSeats = auditorium.getVipSeats();
         for (Integer seat : seats) {
             totalPrice += vipSeats.contains(seat) ? seatPrice * 2 : seatPrice;
         }
         return totalPrice * event.getRating().getMultiplier();
+    }
+
+    private double calculatePrice(Event event, LocalDateTime dateTime, Set<Integer> seats, User user, Auditorium auditorium) {
+        double discount = discountService.getDiscount(user, event, dateTime);
+        return getPrice(event, seats, auditorium, discount);
     }
 
     public void setDiscountService(DiscountService discountService) {

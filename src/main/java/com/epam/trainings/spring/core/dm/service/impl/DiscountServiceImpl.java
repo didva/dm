@@ -12,6 +12,17 @@ public class DiscountServiceImpl implements DiscountService {
     private List<DiscountStrategy> strategies;
 
     @Override
+    public double checkDiscount(User user, Event event, LocalDateTime dateTime) {
+        if (event == null || dateTime == null) {
+            throw new IllegalArgumentException();
+        }
+        if (strategies == null) {
+            return 0;
+        }
+        return strategies.stream().mapToDouble(strategy -> strategy.checkDiscount(user, event, dateTime)).max().orElse(0);
+    }
+
+    @Override
     public double getDiscount(User user, Event event, LocalDateTime dateTime) {
         if (event == null || dateTime == null) {
             throw new IllegalArgumentException();

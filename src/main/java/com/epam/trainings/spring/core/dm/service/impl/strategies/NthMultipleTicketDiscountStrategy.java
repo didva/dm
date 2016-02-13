@@ -19,6 +19,15 @@ public class NthMultipleTicketDiscountStrategy implements DiscountService.Discou
     @Override
     @TrackDiscount(name = "Nth Ticket Discount")
     public double getDiscount(User user, Event event, LocalDateTime dateTime) {
+        return calculateDiscount(user, event);
+    }
+
+    @Override
+    public double checkDiscount(User user, Event event, LocalDateTime dateTime) {
+        return calculateDiscount(user, event);
+    }
+
+    private double calculateDiscount(User user, Event event) {
         if (event == null) {
             throw new IllegalArgumentException();
         }

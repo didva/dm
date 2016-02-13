@@ -36,10 +36,9 @@ public class TicketsDaoInMemoryImpl implements TicketsDao {
             ticketsForUser = new ArrayList<>();
             ticketsByUser.put(userId, ticketsForUser);
         }
+        ticket.setId(++count);
         ticketsForUser.add(ticket);
         tickets.put(ticket.getId(), ticket);
-        ++count;
-        ticket.setId(count);
     }
 
     @Override

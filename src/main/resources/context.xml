@@ -63,11 +63,14 @@
         <property name="userDao" ref="userDao"/>
         <property name="ticketsDao" ref="ticketsDao"/>
     </bean>
-    <bean id="eventsStatisticService" class="com.epam.trainings.spring.core.dm.service.impl.EventsStatisticServiceImpl">
+    <bean id="statisticService" class="com.epam.trainings.spring.core.dm.service.impl.StatisticServiceImpl">
         <property name="eventByNameAccessionsCounterDao" ref="eventByNameAccessionsCounterDao"/>
         <property name="eventPriceCalculationsCounterDao" ref="eventPriceCalculationsCounterDao"/>
         <property name="eventTicketsBookingsCounterDao" ref="eventTicketsBookingsCounterDao"/>
+        <property name="discountCounterDao" ref="discountCounterDao"/>
+        <property name="luckyDao" ref="luckyDao"/>
     </bean>
+    <bean id="randomGenerator" class="com.epam.trainings.spring.core.dm.service.impl.RandomGeneratorServiceImpl"/>
     <!--Services End-->
 
     <!-- UI Start-->
@@ -92,12 +95,30 @@
                 <property name="eventService" ref="eventService"/>
             </bean>
         </property>
+        <property name="statisticsMenu">
+            <bean class="com.epam.trainings.spring.core.dm.ui.menus.console.StatisticsMenu">
+                <property name="parent" ref="menu"/>
+                <property name="consoleReader" ref="consoleReader"/>
+                <property name="statisticService" ref="statisticService"/>
+            </bean>
+        </property>
     </bean>
     <!-- UI End-->
 
     <!-- Aspects Start -->
     <bean class="com.epam.trainings.spring.core.dm.aspects.EventsStatisticAspect">
-        <property name="eventsStatisticService" ref="eventsStatisticService"/>
+        <property name="statisticService" ref="statisticService"/>
+    </bean>
+    <bean class="com.epam.trainings.spring.core.dm.aspects.DiscountsStatisticAspect">
+        <property name="statisticService" ref="statisticService"/>
+    </bean>
+    <bean class="com.epam.trainings.spring.core.dm.aspects.LuckyAspect">
+        <lookup-method name="isLucky" bean="isLucky" />
+        <property name="statisticService" ref="statisticService"/>
     </bean>
     <!-- Aspects End -->
+
+    <!-- Lucky config start -->
+    <bean id="isLucky" factory-bean="randomGenerator" factory-method="getBoolean" scope="prototype"/>
+    <!-- Lucky config end -->
 </beans>

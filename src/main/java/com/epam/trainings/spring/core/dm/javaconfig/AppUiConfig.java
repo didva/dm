@@ -1,13 +1,11 @@
 package com.epam.trainings.spring.core.dm.javaconfig;
 
-import com.epam.trainings.spring.core.dm.service.AuditoriumService;
-import com.epam.trainings.spring.core.dm.service.BookingService;
-import com.epam.trainings.spring.core.dm.service.EventService;
-import com.epam.trainings.spring.core.dm.service.UserService;
+import com.epam.trainings.spring.core.dm.service.*;
 import com.epam.trainings.spring.core.dm.ui.ConsoleReader;
 import com.epam.trainings.spring.core.dm.ui.Menu;
 import com.epam.trainings.spring.core.dm.ui.menus.console.AdminMenu;
 import com.epam.trainings.spring.core.dm.ui.menus.console.BaseMenu;
+import com.epam.trainings.spring.core.dm.ui.menus.console.StatisticsMenu;
 import com.epam.trainings.spring.core.dm.ui.menus.console.UserMenu;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +22,8 @@ public class AppUiConfig {
     private EventService eventService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private StatisticService statisticService;
 
     @Bean
     public ConsoleReader consoleReader() {
@@ -31,14 +31,16 @@ public class AppUiConfig {
     }
 
     @Bean
-    public Menu userMenu() {
+    public Menu baseMenu() {
         BaseMenu baseMenu = new BaseMenu();
 
         Menu adminMenu = getAdminMenu(baseMenu);
         Menu userMenu = getUserMenu(baseMenu);
+        Menu statisticMenu = getStatisticMenu(baseMenu);
 
         baseMenu.setAdminMenu(adminMenu);
         baseMenu.setUserMenu(userMenu);
+        baseMenu.setStatisticsMenu(statisticMenu);
         return baseMenu;
     }
 
@@ -61,5 +63,13 @@ public class AppUiConfig {
         userMenu.setBookingService(bookingService);
         userMenu.setEventService(eventService);
         return userMenu;
+    }
+
+    private Menu getStatisticMenu(Menu parent) {
+        StatisticsMenu statisticsMenu = new StatisticsMenu();
+        statisticsMenu.setParent(parent);
+        statisticsMenu.setConsoleReader(consoleReader());
+        statisticsMenu.setStatisticService(statisticService);
+        return statisticsMenu;
     }
 }

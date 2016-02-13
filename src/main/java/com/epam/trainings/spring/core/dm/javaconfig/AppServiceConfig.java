@@ -6,6 +6,7 @@ import com.epam.trainings.spring.core.dm.service.impl.*;
 import com.epam.trainings.spring.core.dm.service.impl.strategies.BirthdayDiscountStrategy;
 import com.epam.trainings.spring.core.dm.service.impl.strategies.NthMultipleTicketDiscountStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +36,19 @@ public class AppServiceConfig {
     private EventDao eventDao;
     @Autowired
     private AssignedEventsDao assignedEventsDao;
+    @Autowired
+    @Qualifier("eventByNameAccessionsCounterDao")
+    private EventCounterDao eventByNameAccessionsCounterDao;
+    @Autowired
+    @Qualifier("eventPriceCalculationsCounterDao")
+    private EventCounterDao eventPriceCalculationsCounterDao;
+    @Autowired
+    @Qualifier("eventTicketsBookingsCounterDao")
+    private EventCounterDao eventTicketsBookingsCounterDao;
+    @Autowired
+    private DiscountCounterDao discountCounterDao;
+    @Autowired
+    private LuckyDao luckyDao;
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
@@ -79,6 +93,22 @@ public class AppServiceConfig {
         userService.setUserDao(userDao);
         userService.setTicketsDao(ticketsDao);
         return userService;
+    }
+
+    @Bean
+    public StatisticService eventsStatisticService() {
+        StatisticServiceImpl statisticService = new StatisticServiceImpl();
+        statisticService.setEventByNameAccessionsCounterDao(eventByNameAccessionsCounterDao);
+        statisticService.setEventPriceCalculationsCounterDao(eventPriceCalculationsCounterDao);
+        statisticService.setEventTicketsBookingsCounterDao(eventTicketsBookingsCounterDao);
+        statisticService.setDiscountCounterDao(discountCounterDao);
+        statisticService.setLuckyDao(luckyDao);
+        return statisticService;
+    }
+
+    @Bean
+    public RandomGeneratorService randomGeneratorService() {
+        return new RandomGeneratorServiceImpl();
     }
 
     private DiscountService.DiscountStrategy createBirthdayDiscount() {

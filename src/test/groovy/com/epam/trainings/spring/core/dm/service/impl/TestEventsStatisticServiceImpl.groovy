@@ -9,7 +9,7 @@ import static org.mockito.Mockito.*
 
 class TestEventsStatisticServiceImpl {
 
-    EventsStatisticServiceImpl eventsStatisticService
+    StatisticServiceImpl eventsStatisticService
 
     EventCounterDao eventByNameAccessionsCounterDao
     EventCounterDao eventPriceCalculationsCounterDao
@@ -21,7 +21,7 @@ class TestEventsStatisticServiceImpl {
         eventPriceCalculationsCounterDao = mock EventCounterDao
         eventTicketsBookingsCounterDao = mock EventCounterDao
 
-        eventsStatisticService = new EventsStatisticServiceImpl()
+        eventsStatisticService = new StatisticServiceImpl()
         eventsStatisticService.setEventByNameAccessionsCounterDao eventByNameAccessionsCounterDao
         eventsStatisticService.setEventPriceCalculationsCounterDao eventPriceCalculationsCounterDao
         eventsStatisticService.setEventTicketsBookingsCounterDao eventTicketsBookingsCounterDao

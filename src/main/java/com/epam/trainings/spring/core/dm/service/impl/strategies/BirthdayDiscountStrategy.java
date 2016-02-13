@@ -14,6 +14,15 @@ public class BirthdayDiscountStrategy implements DiscountService.DiscountStrateg
     @Override
     @TrackDiscount(name = "Birthday Discount")
     public double getDiscount(User user, Event event, LocalDateTime dateTime) {
+        return calculateDiscount(user, event, dateTime);
+    }
+
+    @Override
+    public double checkDiscount(User user, Event event, LocalDateTime dateTime) {
+        return calculateDiscount(user, event, dateTime);
+    }
+
+    private double calculateDiscount(User user, Event event, LocalDateTime dateTime) {
         if (dateTime == null || event == null) {
             throw new IllegalArgumentException();
         }

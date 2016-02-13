@@ -6,11 +6,13 @@ public class BaseMenu implements Menu {
 
     private Menu adminMenu;
     private Menu userMenu;
+    private Menu statisticsMenu;
 
     @Override
     public void printMenu() {
         System.out.println("1 - Admin menu");
         System.out.println("2 - User menu");
+        System.out.println("3 - Statistics menu");
         System.out.println("0 - Exit");
     }
 
@@ -21,6 +23,8 @@ public class BaseMenu implements Menu {
                 return adminMenu;
             case 2:
                 return userMenu;
+            case 3:
+                return statisticsMenu;
             case 0:
                 return null;
             default:
@@ -35,5 +39,9 @@ public class BaseMenu implements Menu {
 
     public void setUserMenu(Menu userMenu) {
         this.userMenu = userMenu;
+    }
+
+    public void setStatisticsMenu(Menu statisticsMenu) {
+        this.statisticsMenu = statisticsMenu;
     }
 }

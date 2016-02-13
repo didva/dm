@@ -57,7 +57,7 @@ class TestBookingServiceImpl {
         def discountInPercentage = 0.5D, seats = [2, 3],
             totalPrice = discountInPercentage * event.rating.multiplier * (event.price + event.price * 2)
         when(eventService.getById(event.id)).thenReturn event
-        when(discountService.getDiscount(user, event, assignedEvent.dateTime)).thenReturn discountInPercentage * event.price
+        when(discountService.checkDiscount(user, event, assignedEvent.dateTime)).thenReturn discountInPercentage * event.price
         when(auditoriumService.getAuditorium(auditorium.name)).thenReturn auditorium
 
         assert totalPrice == bookingService.getTicketPrice(assignedEvent, seats as Set, user)

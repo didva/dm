@@ -39,6 +39,18 @@ public class ConsoleReader {
         }
     }
 
+    public Long readLong() {
+        while (true) {
+            try {
+                return Long.parseLong(reader.readLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter correct int value!");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     public int readInt() {
         while (true) {
             try {

@@ -56,4 +56,17 @@ public class AppDaoConfig {
         return new GeneralEventCounterDaoInMemoryImpl();
     }
 
+    @Bean
+    public DiscountCounterDao discountCounterDao() {
+        return new DiscountCounterDaoInMemoryImpl();
+    }
+
+    @Bean
+    public LuckyDao luckyDao() {
+        LuckyDaoInMemoryImpl luckyDao = new LuckyDaoInMemoryImpl();
+        luckyDao.setAssignedEventsDao(assignedEventsDao());
+        luckyDao.setTicketsDao(ticketsDao());
+        return luckyDao;
+    }
+
 }

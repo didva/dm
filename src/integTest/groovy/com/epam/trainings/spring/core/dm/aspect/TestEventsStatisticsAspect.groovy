@@ -5,7 +5,7 @@ import com.epam.trainings.spring.core.dm.model.Rating
 import com.epam.trainings.spring.core.dm.service.AuditoriumService
 import com.epam.trainings.spring.core.dm.service.BookingService
 import com.epam.trainings.spring.core.dm.service.EventService
-import com.epam.trainings.spring.core.dm.service.EventsStatisticService
+import com.epam.trainings.spring.core.dm.service.StatisticService
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,7 +23,7 @@ class TestEventsStatisticsAspect {
     @Autowired
     BookingService bookingService
     @Autowired
-    EventsStatisticService eventsStatisticService
+    StatisticService eventsStatisticService
     @Autowired
     AuditoriumService auditoriumService
 

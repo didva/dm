@@ -53,4 +53,12 @@ public class Counter<T> {
         result = 31 * result + times;
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Counter{" +
+                "itemId=" + itemId +
+                ", times=" + times +
+                '}';
+    }
 }
