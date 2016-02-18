@@ -1,7 +1,22 @@
 package com.epam.trainings.spring.core.dm.javaconfig;
 
-import com.epam.trainings.spring.core.dm.dao.*;
-import com.epam.trainings.spring.core.dm.dao.impl.inmemory.*;
+import com.epam.trainings.spring.core.dm.dao.AssignedEventsDao;
+import com.epam.trainings.spring.core.dm.dao.AuditoriumDao;
+import com.epam.trainings.spring.core.dm.dao.DiscountCounterDao;
+import com.epam.trainings.spring.core.dm.dao.EventCounterDao;
+import com.epam.trainings.spring.core.dm.dao.EventDao;
+import com.epam.trainings.spring.core.dm.dao.LuckyDao;
+import com.epam.trainings.spring.core.dm.dao.TicketsDao;
+import com.epam.trainings.spring.core.dm.dao.UserDao;
+import com.epam.trainings.spring.core.dm.dao.impl.inmemory.AssignedEventsDaoInMemoryImpl;
+import com.epam.trainings.spring.core.dm.dao.impl.inmemory.AuditoriumDaoInMemoryImpl;
+import com.epam.trainings.spring.core.dm.dao.impl.inmemory.DiscountCounterDaoInMemoryImpl;
+import com.epam.trainings.spring.core.dm.dao.impl.inmemory.EventDaoInMemoryImpl;
+import com.epam.trainings.spring.core.dm.dao.impl.inmemory.GeneralEventCounterDaoInMemoryImpl;
+import com.epam.trainings.spring.core.dm.dao.impl.inmemory.LuckyDaoInMemoryImpl;
+import com.epam.trainings.spring.core.dm.dao.impl.inmemory.TicketsDaoInMemoryImpl;
+import com.epam.trainings.spring.core.dm.dao.impl.inmemory.UserDaoInMemoryImpl;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -63,10 +78,7 @@ public class AppDaoConfig {
 
     @Bean
     public LuckyDao luckyDao() {
-        LuckyDaoInMemoryImpl luckyDao = new LuckyDaoInMemoryImpl();
-        luckyDao.setAssignedEventsDao(assignedEventsDao());
-        luckyDao.setTicketsDao(ticketsDao());
-        return luckyDao;
+        return new LuckyDaoInMemoryImpl();
     }
 
 }

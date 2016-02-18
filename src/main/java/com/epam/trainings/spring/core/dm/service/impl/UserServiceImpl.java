@@ -7,6 +7,8 @@ import com.epam.trainings.spring.core.dm.model.Ticket;
 import com.epam.trainings.spring.core.dm.model.User;
 import com.epam.trainings.spring.core.dm.service.UserService;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 public class UserServiceImpl implements UserService {
@@ -15,6 +17,7 @@ public class UserServiceImpl implements UserService {
     private TicketsDao ticketsDao;
 
     @Override
+    @Transactional
     public void register(User user) {
         if (user == null || user.getName() == null || user.getEmail() == null) {
             throw new IllegalArgumentException();
@@ -32,6 +35,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void remove(long id) {
         User user = this.getById(id);
         if (user == null) {

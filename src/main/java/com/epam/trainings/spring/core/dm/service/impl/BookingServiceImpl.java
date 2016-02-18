@@ -8,6 +8,8 @@ import com.epam.trainings.spring.core.dm.service.BookingService;
 import com.epam.trainings.spring.core.dm.service.DiscountService;
 import com.epam.trainings.spring.core.dm.service.EventService;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -44,6 +46,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public void bookTicket(AssignedEvent assignedEvent, Set<Integer> seats, User user) {
         if (assignedEvent == null || seats == null || seats.isEmpty()) {
             throw new IllegalArgumentException();

@@ -1,11 +1,25 @@
 import com.epam.trainings.spring.core.dm.aspects.DiscountsStatisticAspect
 import com.epam.trainings.spring.core.dm.aspects.EventsStatisticAspect
-import com.epam.trainings.spring.core.dm.dao.impl.inmemory.*
+import com.epam.trainings.spring.core.dm.dao.impl.inmemory.AuditoriumDaoInMemoryImpl
+import com.epam.trainings.spring.core.dm.dao.impl.inmemory.DiscountCounterDaoInMemoryImpl
+import com.epam.trainings.spring.core.dm.dao.impl.inmemory.GeneralEventCounterDaoInMemoryImpl
+import com.epam.trainings.spring.core.dm.dao.impl.inmemory.LuckyDaoInMemoryImpl
+import com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.AssignedEventsJdbcDao
+import com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.DiscountCounterJdbcDao
+import com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.EventJdbcDao
+import com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.GeneralEventCounterJdbcDao
+import com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.LuckyJdbcDao
+import com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.TicketsJdbcDao
+import com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.UserJdbcDao
 import com.epam.trainings.spring.core.dm.service.impl.*
 import com.epam.trainings.spring.core.dm.service.impl.strategies.BirthdayDiscountStrategy
 import com.epam.trainings.spring.core.dm.service.impl.strategies.NthMultipleTicketDiscountStrategy
 import org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator
 import org.springframework.core.io.ClassPathResource
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator
 
 beans {
 
@@ -14,19 +28,44 @@ beans {
     properties.load(new ClassPathResource('config.properties').inputStream);
     // Properties end
 
+    //JDBC start
+    def dataSourceBean = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build()
+    def populator = new ResourceDatabasePopulator();
+    populator.addScript(new ClassPathResource('db/create-db.sql'))
+    DatabasePopulatorUtils.execute(populator, dataSourceBean)
+    //JDBC end
+
     // DAOs start
-    assignedEventsDao(AssignedEventsDaoInMemoryImpl)
     auditoriumDao(AuditoriumDaoInMemoryImpl, properties.get("auditorium.properties.path"))
-    eventDao(EventDaoInMemoryImpl)
-    ticketsDao(TicketsDaoInMemoryImpl)
-    userDao(UserDaoInMemoryImpl)
-    eventByNameAccessionsCounterDao(GeneralEventCounterDaoInMemoryImpl)
-    eventPriceCalculationsCounterDao(GeneralEventCounterDaoInMemoryImpl)
-    eventTicketsBookingsCounterDao(GeneralEventCounterDaoInMemoryImpl)
-    discountCounterDao(DiscountCounterDaoInMemoryImpl)
-    luckyDao(LuckyDaoInMemoryImpl) {
-        ticketsDao = ref('ticketsDao')
-        assignedEventsDao = ref('assignedEventsDao')
+    userDao(UserJdbcDao) {
+        dataSource = dataSourceBean
+    }
+    eventDao(EventJdbcDao) {
+        dataSource = dataSourceBean
+    }
+    assignedEventsDao(AssignedEventsJdbcDao) {
+        dataSource = dataSourceBean
+    }
+    ticketsDao(TicketsJdbcDao) {
+        dataSource = dataSourceBean
+    }
+    luckyDao(LuckyJdbcDao) {
+        dataSource = dataSourceBean
+    }
+    discountCounterDao(DiscountCounterJdbcDao) {
+        dataSource = dataSourceBean
+    }
+    eventByNameAccessionsCounterDao(GeneralEventCounterJdbcDao) {
+        tableName = 'events_by_name'
+        dataSource = dataSourceBean
+    }
+    eventPriceCalculationsCounterDao(GeneralEventCounterJdbcDao) {
+        tableName = 'events_price'
+        dataSource = dataSourceBean
+    }
+    eventTicketsBookingsCounterDao(GeneralEventCounterJdbcDao) {
+        tableName = 'events_tickets'
+        dataSource = dataSourceBean
     }
     // DAOs end
 
@@ -60,11 +99,13 @@ beans {
         auditoriumService = ref('auditoriumService')
     }
     statisticService(StatisticServiceImpl) {
+        eventService = ref('eventService')
         eventByNameAccessionsCounterDao = ref('eventByNameAccessionsCounterDao')
         eventPriceCalculationsCounterDao = ref('eventPriceCalculationsCounterDao')
         eventTicketsBookingsCounterDao = ref('eventTicketsBookingsCounterDao')
         discountCounterDao = ref("discountCounterDao")
         luckyDao = ref("luckyDao")
+        ticketsDao = ref('ticketsDao')
     }
     // Services end
 

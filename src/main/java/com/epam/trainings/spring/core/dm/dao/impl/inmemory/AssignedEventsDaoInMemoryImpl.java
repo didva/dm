@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class AssignedEventsDaoInMemoryImpl implements AssignedEventsDao {
 
@@ -31,6 +32,11 @@ public class AssignedEventsDaoInMemoryImpl implements AssignedEventsDao {
     public void assignAuditorium(AssignedEvent assignedEvent) {
         assignedEvent.setId(events.size() + 1);
         events.add(assignedEvent);
+    }
+
+    @Override
+    public List<AssignedEvent> findByEvent(long eventId) {
+        return events.stream().filter(e -> e.getEventId() == eventId).collect(Collectors.toList());
     }
 
     @Override

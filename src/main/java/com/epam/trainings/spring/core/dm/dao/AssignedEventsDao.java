@@ -15,6 +15,8 @@ public interface AssignedEventsDao {
 
     void assignAuditorium(AssignedEvent assignedEvent);
 
+    List<AssignedEvent> findByEvent(long eventId);
+
     AssignedEvent findByEvent(long eventId, LocalDateTime dateTime);
 
     AssignedEvent findByAuditorium(String auditorium, LocalDateTime dateTime);

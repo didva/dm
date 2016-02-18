@@ -8,7 +8,7 @@ public interface LuckyDao {
 
     void register(long ticketId, long userId);
 
-    List<LuckyInfo> findByEventId(long eventId);
+    LuckyInfo findByTicketId(long ticketId);
 
     List<LuckyInfo> findByUserId(long userId);
 

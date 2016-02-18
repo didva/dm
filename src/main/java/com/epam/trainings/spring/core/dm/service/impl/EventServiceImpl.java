@@ -8,6 +8,8 @@ import com.epam.trainings.spring.core.dm.model.Auditorium;
 import com.epam.trainings.spring.core.dm.model.Event;
 import com.epam.trainings.spring.core.dm.service.EventService;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,6 +19,7 @@ public class EventServiceImpl implements EventService {
     private AssignedEventsDao assignedEventsDao;
 
     @Override
+    @Transactional
     public void create(Event event) {
         if (event == null || event.getName() == null || event.getRating() == null) {
             throw new IllegalArgumentException();
@@ -28,6 +31,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public void remove(long id) {
         Event event = eventDao.find(id);
         if (event == null) {
@@ -69,6 +73,11 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<AssignedEvent> getAllAssignedEvents() {
         return assignedEventsDao.findAll();
+    }
+
+    @Override
+    public List<AssignedEvent> getAssignedEvents(long eventId) {
+        return assignedEventsDao.findByEvent(eventId);
     }
 
     @Override

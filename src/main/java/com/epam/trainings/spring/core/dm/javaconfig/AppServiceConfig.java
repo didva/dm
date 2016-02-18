@@ -98,11 +98,13 @@ public class AppServiceConfig {
     @Bean
     public StatisticService eventsStatisticService() {
         StatisticServiceImpl statisticService = new StatisticServiceImpl();
+        statisticService.setEventService(eventService());
         statisticService.setEventByNameAccessionsCounterDao(eventByNameAccessionsCounterDao);
         statisticService.setEventPriceCalculationsCounterDao(eventPriceCalculationsCounterDao);
         statisticService.setEventTicketsBookingsCounterDao(eventTicketsBookingsCounterDao);
         statisticService.setDiscountCounterDao(discountCounterDao);
         statisticService.setLuckyDao(luckyDao);
+        statisticService.setTicketsDao(ticketsDao);
         return statisticService;
     }
 

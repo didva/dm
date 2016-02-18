@@ -3,20 +3,38 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd">
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+       http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.2.xsd">
 
     <aop:aspectj-autoproxy/>
+
+    <!-- JDBC start-->
+    <tx:annotation-driven/>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <jdbc:embedded-database id="dataSource" type="H2">
+        <jdbc:script location="classpath:db/create-db.sql"/>
+    </jdbc:embedded-database>
+    <!-- JDBC end-->
 
     <!--Properties Start-->
     <context:property-placeholder location="classpath:config.properties"/>
     <!--Properties End-->
 
     <!--DAOs Start-->
-    <bean id="userDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.UserDaoInMemoryImpl"/>
-    <bean id="ticketsDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.TicketsDaoInMemoryImpl"/>
+    <bean id="baseJdbcDao" abstract="true" class="com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.BaseJdbcDao">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <bean id="userDao" class="com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.UserJdbcDao" parent="baseJdbcDao"/>
+
     <bean id="eventDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.EventDaoInMemoryImpl"/>
+    <bean id="ticketsDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.TicketsDaoInMemoryImpl"/>
     <bean id="assignedEventsDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.AssignedEventsDaoInMemoryImpl"/>
     <bean id="auditoriumDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.AuditoriumDaoInMemoryImpl">
         <constructor-arg value="${auditorium.properties.path}"/>
@@ -25,10 +43,7 @@
     <bean id="eventPriceCalculationsCounterDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.GeneralEventCounterDaoInMemoryImpl"/>
     <bean id="eventTicketsBookingsCounterDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.GeneralEventCounterDaoInMemoryImpl"/>
     <bean id="discountCounterDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.DiscountCounterDaoInMemoryImpl"/>
-    <bean id="luckyDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.LuckyDaoInMemoryImpl">
-        <property name="assignedEventsDao" ref="assignedEventsDao"/>
-        <property name="ticketsDao" ref="ticketsDao"/>
-    </bean>
+    <bean id="luckyDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.LuckyDaoInMemoryImpl"/>
     <!--DAOs End-->
 
     <!--Services Start-->
@@ -64,11 +79,13 @@
         <property name="ticketsDao" ref="ticketsDao"/>
     </bean>
     <bean id="statisticService" class="com.epam.trainings.spring.core.dm.service.impl.StatisticServiceImpl">
+        <property name="eventService" ref="eventService"/>
         <property name="eventByNameAccessionsCounterDao" ref="eventByNameAccessionsCounterDao"/>
         <property name="eventPriceCalculationsCounterDao" ref="eventPriceCalculationsCounterDao"/>
         <property name="eventTicketsBookingsCounterDao" ref="eventTicketsBookingsCounterDao"/>
         <property name="discountCounterDao" ref="discountCounterDao"/>
         <property name="luckyDao" ref="luckyDao"/>
+        <property name="ticketsDao" ref="ticketsDao"/>
     </bean>
     <bean id="randomGenerator" class="com.epam.trainings.spring.core.dm.service.impl.RandomGeneratorServiceImpl"/>
     <!--Services End-->
@@ -113,7 +130,7 @@
         <property name="statisticService" ref="statisticService"/>
     </bean>
     <bean class="com.epam.trainings.spring.core.dm.aspects.LuckyAspect">
-        <lookup-method name="isLucky" bean="isLucky" />
+        <lookup-method name="isLucky" bean="isLucky"/>
         <property name="statisticService" ref="statisticService"/>
     </bean>
     <!-- Aspects End -->
