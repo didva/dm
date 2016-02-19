@@ -1,10 +1,30 @@
 package com.epam.trainings.spring.core.dm.javaconfig;
 
-import com.epam.trainings.spring.core.dm.dao.*;
-import com.epam.trainings.spring.core.dm.service.*;
-import com.epam.trainings.spring.core.dm.service.impl.*;
+import com.epam.trainings.spring.core.dm.dao.AssignedEventsDao;
+import com.epam.trainings.spring.core.dm.dao.AuditoriumDao;
+import com.epam.trainings.spring.core.dm.dao.DiscountCounterDao;
+import com.epam.trainings.spring.core.dm.dao.EventCounterDao;
+import com.epam.trainings.spring.core.dm.dao.EventDao;
+import com.epam.trainings.spring.core.dm.dao.LuckyDao;
+import com.epam.trainings.spring.core.dm.dao.TicketsDao;
+import com.epam.trainings.spring.core.dm.dao.UserDao;
+import com.epam.trainings.spring.core.dm.service.AuditoriumService;
+import com.epam.trainings.spring.core.dm.service.BookingService;
+import com.epam.trainings.spring.core.dm.service.DiscountService;
+import com.epam.trainings.spring.core.dm.service.EventService;
+import com.epam.trainings.spring.core.dm.service.RandomGeneratorService;
+import com.epam.trainings.spring.core.dm.service.StatisticService;
+import com.epam.trainings.spring.core.dm.service.UserService;
+import com.epam.trainings.spring.core.dm.service.impl.AuditoriumServiceImpl;
+import com.epam.trainings.spring.core.dm.service.impl.BookingServiceImpl;
+import com.epam.trainings.spring.core.dm.service.impl.DiscountServiceImpl;
+import com.epam.trainings.spring.core.dm.service.impl.EventServiceImpl;
+import com.epam.trainings.spring.core.dm.service.impl.RandomGeneratorServiceImpl;
+import com.epam.trainings.spring.core.dm.service.impl.StatisticServiceImpl;
+import com.epam.trainings.spring.core.dm.service.impl.UserServiceImpl;
 import com.epam.trainings.spring.core.dm.service.impl.strategies.BirthdayDiscountStrategy;
 import com.epam.trainings.spring.core.dm.service.impl.strategies.NthMultipleTicketDiscountStrategy;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,11 +32,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.Arrays;
 
+import javax.sql.DataSource;
+
 @Configuration
 @PropertySource("classpath:config.properties")
+@EnableTransactionManagement
 public class AppServiceConfig {
 
     @Value("${discount.birthday.discountPercentage}")
@@ -26,6 +52,8 @@ public class AppServiceConfig {
     @Value("${discount.nthTicket.ticketsToDiscount}")
     private int ticketToDiscount;
 
+    @Autowired
+    private DataSource dataSource;
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -49,6 +77,11 @@ public class AppServiceConfig {
     private DiscountCounterDao discountCounterDao;
     @Autowired
     private LuckyDao luckyDao;
+
+    @Bean
+    public PlatformTransactionManager transactionManager() {
+        return new DataSourceTransactionManager(dataSource);
+    }
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {

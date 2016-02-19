@@ -15,8 +15,8 @@ public class App {
 
     public static void main(String[] args) {
         // For java-based configuration - uncomment line below and import classes.
-        //ApplicationContext context = new AnnotationConfigApplicationContext(AppDaoConfig.class, AppServiceConfig.class, AppUiConfig.class, AppAspectConfig.class);
-        ApplicationContext context = new ClassPathXmlApplicationContext("context.xml");
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppDaoConfig.class, AppServiceConfig.class, AppUiConfig.class, AppAspectConfig.class);
+        //ApplicationContext context = new ClassPathXmlApplicationContext("context.xml");
         Menu menu = context.getBean(Menu.class);
         ConsoleReader reader = context.getBean(ConsoleReader.class);
         while (menu != null) {

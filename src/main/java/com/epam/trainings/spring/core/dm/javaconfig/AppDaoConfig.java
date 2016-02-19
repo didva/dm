@@ -8,32 +8,49 @@ import com.epam.trainings.spring.core.dm.dao.EventDao;
 import com.epam.trainings.spring.core.dm.dao.LuckyDao;
 import com.epam.trainings.spring.core.dm.dao.TicketsDao;
 import com.epam.trainings.spring.core.dm.dao.UserDao;
-import com.epam.trainings.spring.core.dm.dao.impl.inmemory.AssignedEventsDaoInMemoryImpl;
 import com.epam.trainings.spring.core.dm.dao.impl.inmemory.AuditoriumDaoInMemoryImpl;
-import com.epam.trainings.spring.core.dm.dao.impl.inmemory.DiscountCounterDaoInMemoryImpl;
-import com.epam.trainings.spring.core.dm.dao.impl.inmemory.EventDaoInMemoryImpl;
-import com.epam.trainings.spring.core.dm.dao.impl.inmemory.GeneralEventCounterDaoInMemoryImpl;
 import com.epam.trainings.spring.core.dm.dao.impl.inmemory.LuckyDaoInMemoryImpl;
-import com.epam.trainings.spring.core.dm.dao.impl.inmemory.TicketsDaoInMemoryImpl;
-import com.epam.trainings.spring.core.dm.dao.impl.inmemory.UserDaoInMemoryImpl;
+import com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.AssignedEventsJdbcDao;
+import com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.DiscountCounterJdbcDao;
+import com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.EventJdbcDao;
+import com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.GeneralEventCounterJdbcDao;
+import com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.TicketsJdbcDao;
+import com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.UserJdbcDao;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import java.io.IOException;
 
+import javax.sql.DataSource;
+
 @Configuration
-@PropertySource("classpath:config.properties")
+@PropertySource({"classpath:config.properties", "classpath:db/table-names.properties"})
 public class AppDaoConfig {
 
     @Value("${auditorium.properties.path}")
     private String auditoriumsPath;
+    @Value("${statistic.events.by.name.table.name}")
+    private String eventsByNameTableName;
+    @Value("${statistic.events.price.table.name}")
+    private String eventsPriceTableName;
+    @Value("${statistic.events.tickets.table.name}")
+    private String eventsTicketsTableName;
+
+    @Bean
+    public DataSource dataSource() {
+        return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).addScript("db/create-db.sql").build();
+    }
 
     @Bean
     public UserDao userDao() {
-        return new UserDaoInMemoryImpl();
+        UserJdbcDao userJdbcDao = new UserJdbcDao();
+        userJdbcDao.setDataSource(dataSource());
+        return userJdbcDao;
     }
 
     @Bean
@@ -43,37 +60,54 @@ public class AppDaoConfig {
 
     @Bean
     public TicketsDao ticketsDao() {
-        return new TicketsDaoInMemoryImpl();
+        TicketsJdbcDao ticketsJdbcDao = new TicketsJdbcDao();
+        ticketsJdbcDao.setDataSource(dataSource());
+        return ticketsJdbcDao;
     }
 
     @Bean
     public EventDao eventDao() {
-        return new EventDaoInMemoryImpl();
+        EventJdbcDao eventJdbcDao = new EventJdbcDao();
+        eventJdbcDao.setDataSource(dataSource());
+        return eventJdbcDao;
     }
 
     @Bean
     public AssignedEventsDao assignedEventsDao() {
-        return new AssignedEventsDaoInMemoryImpl();
+        AssignedEventsJdbcDao assignedEventsJdbcDao = new AssignedEventsJdbcDao();
+        assignedEventsJdbcDao.setDataSource(dataSource());
+        return assignedEventsJdbcDao;
     }
 
     @Bean
     public EventCounterDao eventByNameAccessionsCounterDao() {
-        return new GeneralEventCounterDaoInMemoryImpl();
+        GeneralEventCounterJdbcDao generalEventCounterJdbcDao = new GeneralEventCounterJdbcDao();
+        generalEventCounterJdbcDao.setDataSource(dataSource());
+        generalEventCounterJdbcDao.setTableName(eventsByNameTableName);
+        return generalEventCounterJdbcDao;
     }
 
     @Bean
     public EventCounterDao eventPriceCalculationsCounterDao() {
-        return new GeneralEventCounterDaoInMemoryImpl();
+        GeneralEventCounterJdbcDao generalEventCounterJdbcDao = new GeneralEventCounterJdbcDao();
+        generalEventCounterJdbcDao.setDataSource(dataSource());
+        generalEventCounterJdbcDao.setTableName(eventsPriceTableName);
+        return generalEventCounterJdbcDao;
     }
 
     @Bean
     public EventCounterDao eventTicketsBookingsCounterDao() {
-        return new GeneralEventCounterDaoInMemoryImpl();
+        GeneralEventCounterJdbcDao generalEventCounterJdbcDao = new GeneralEventCounterJdbcDao();
+        generalEventCounterJdbcDao.setDataSource(dataSource());
+        generalEventCounterJdbcDao.setTableName(eventsTicketsTableName);
+        return generalEventCounterJdbcDao;
     }
 
     @Bean
     public DiscountCounterDao discountCounterDao() {
-        return new DiscountCounterDaoInMemoryImpl();
+        DiscountCounterJdbcDao discountCounterJdbcDao = new DiscountCounterJdbcDao();
+        discountCounterJdbcDao.setDataSource(dataSource());
+        return discountCounterJdbcDao;
     }
 
     @Bean

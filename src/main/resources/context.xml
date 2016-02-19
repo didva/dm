@@ -24,7 +24,7 @@
     <!-- JDBC end-->
 
     <!--Properties Start-->
-    <context:property-placeholder location="classpath:config.properties"/>
+    <context:property-placeholder location="classpath:config.properties, classpath:db/table-names.properties"/>
     <!--Properties End-->
 
     <!--DAOs Start-->
@@ -32,18 +32,24 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
     <bean id="userDao" class="com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.UserJdbcDao" parent="baseJdbcDao"/>
+    <bean id="eventDao" class="com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.EventJdbcDao" parent="baseJdbcDao"/>
+    <bean id="ticketsDao" class="com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.TicketsJdbcDao" parent="baseJdbcDao"/>
+    <bean id="assignedEventsDao" class="com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.AssignedEventsJdbcDao" parent="baseJdbcDao"/>
+    <bean id="eventByNameAccessionsCounterDao" class="com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.GeneralEventCounterJdbcDao" parent="baseJdbcDao">
+        <property name="tableName" value="${statistic.events.by.name.table.name}"/>
+    </bean>
+    <bean id="eventPriceCalculationsCounterDao" class="com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.GeneralEventCounterJdbcDao" parent="baseJdbcDao">
+        <property name="tableName" value="${statistic.events.price.table.name}"/>
+    </bean>
+    <bean id="eventTicketsBookingsCounterDao" class="com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.GeneralEventCounterJdbcDao" parent="baseJdbcDao">
+        <property name="tableName" value="${statistic.events.tickets.table.name}"/>
+    </bean>
+    <bean id="discountCounterDao" class="com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.DiscountCounterJdbcDao" parent="baseJdbcDao"/>
+    <bean id="luckyDao" class="com.epam.trainings.spring.core.dm.dao.impl.spring.jdbc.LuckyJdbcDao" parent="baseJdbcDao"/>
 
-    <bean id="eventDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.EventDaoInMemoryImpl"/>
-    <bean id="ticketsDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.TicketsDaoInMemoryImpl"/>
-    <bean id="assignedEventsDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.AssignedEventsDaoInMemoryImpl"/>
     <bean id="auditoriumDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.AuditoriumDaoInMemoryImpl">
         <constructor-arg value="${auditorium.properties.path}"/>
     </bean>
-    <bean id="eventByNameAccessionsCounterDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.GeneralEventCounterDaoInMemoryImpl"/>
-    <bean id="eventPriceCalculationsCounterDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.GeneralEventCounterDaoInMemoryImpl"/>
-    <bean id="eventTicketsBookingsCounterDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.GeneralEventCounterDaoInMemoryImpl"/>
-    <bean id="discountCounterDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.DiscountCounterDaoInMemoryImpl"/>
-    <bean id="luckyDao" class="com.epam.trainings.spring.core.dm.dao.impl.inmemory.LuckyDaoInMemoryImpl"/>
     <!--DAOs End-->
 
     <!--Services Start-->

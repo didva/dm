@@ -16,10 +16,14 @@ import com.epam.trainings.spring.core.dm.service.impl.strategies.BirthdayDiscoun
 import com.epam.trainings.spring.core.dm.service.impl.strategies.NthMultipleTicketDiscountStrategy
 import org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator
 import org.springframework.core.io.ClassPathResource
+import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator
+import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource
+import org.springframework.transaction.interceptor.BeanFactoryTransactionAttributeSourceAdvisor
+import org.springframework.transaction.interceptor.TransactionInterceptor
 
 beans {
 
@@ -33,6 +37,21 @@ beans {
     def populator = new ResourceDatabasePopulator();
     populator.addScript(new ClassPathResource('db/create-db.sql'))
     DatabasePopulatorUtils.execute(populator, dataSourceBean)
+
+    transactionManager(DataSourceTransactionManager) {
+        dataSource = dataSourceBean
+    }
+    transactionAttributeSource(AnnotationTransactionAttributeSource)
+    transactionInterceptor(TransactionInterceptor) {
+        transactionAttributeSource = ref('transactionAttributeSource')
+        transactionManager = ref('transactionManager')
+    }
+    internalTransactionAdvisor(BeanFactoryTransactionAttributeSourceAdvisor) {
+        transactionAttributeSource = ref('transactionAttributeSource')
+        advice = ref('transactionInterceptor')
+        order = Integer.MAX_VALUE
+    }
+
     //JDBC end
 
     // DAOs start
